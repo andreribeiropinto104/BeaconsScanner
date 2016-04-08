@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin">
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingLeft="30dp"
+        android:paddingTop="80dp">
+
+        <ImageView
+            android:id="@+id/imageView2"
+            android:layout_width="59dp"
+            android:layout_height="59dp"
+            android:background="@drawable/eddystone_logo" />
+
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:paddingLeft="40dp"
+            android:text="EddyStone"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <!--  <LinearLayout
+          android:layout_width="fill_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:orientation="horizontal"
+          android:paddingBottom="20dp"
+          android:paddingLeft="15dp"
+          android:paddingTop="30dp">
+
+          <TextView
+              android:id="@+id/eddystone_name"
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_gravity="left"
+              android:layout_weight="1"
+              android:text="@string/device_name"
+              android:textSize="20sp" />
+
+      </LinearLayout> -->
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp"
+        android:paddingTop="30dp">
+
+        <TextView
+            android:id="@+id/namespace"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:text="@string/namespace"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:id="@+id/instance_id"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="1"
+            android:text="@string/instance"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:id="@+id/txpower_level"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:text="@string/tx_power_level"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/battery_voltage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="1"
+            android:text="@string/battery_voltage"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:id="@+id/eddystone_url"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:autoLink="web"
+            android:text="@string/url"
+            android:textSize="16sp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:id="@+id/eddystone_rssi"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:layout_weight="1"
+            android:text="@string/rssi"
+            android:textSize="16sp" />
+
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingBottom="20dp"
+        android:paddingLeft="15dp">
+
+        <TextView
+            android:id="@+id/eddystone_distance"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:layout_weight="0.27"
+            android:text="@string/distance"
+            android:textSize="16sp" />
+
+    </LinearLayout>
+
+    <!--   <LinearLayout
+           android:layout_width="match_parent"
+           android:layout_height="wrap_content"
+           android:orientation="horizontal"
+           android:paddingBottom="20dp"
+           android:paddingLeft="15dp">
+
+           <TextView
+               android:id="@+id/eddystone_proximity"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_gravity="left"
+               android:layout_weight="1"
+               android:text="@string/proximity"
+               android:textSize="16sp" />
+
+           <TextView
+               android:id="@+id/eddystone_temperature"
+               android:layout_width="0dp"
+               android:layout_height="wrap_content"
+               android:layout_gravity="right"
+               android:layout_weight="1"
+               android:text="@string/temperature"
+               android:textSize="16sp" />
+
+
+       </LinearLayout> -->
+
+
+</LinearLayout>
