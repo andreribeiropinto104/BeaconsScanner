@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/default_margin"
+    android:animateLayoutChanges="true"
+    android:orientation="horizontal"
+    android:weightSum="8">
+
+    <ImageView
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/ibeacon_logo" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="6"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/device_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:text="@string/device_name"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/list_rssi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/rssi" />
+
+        <TextView
+            android:id="@+id/list_proximity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingBottom="10dp"
+            android:text="@string/proximity" />
+
+    </LinearLayout>
+</LinearLayout>
