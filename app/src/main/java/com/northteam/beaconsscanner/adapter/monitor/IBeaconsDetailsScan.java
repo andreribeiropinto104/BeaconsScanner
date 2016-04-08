@@ -10,34 +10,32 @@ import android.widget.TextView;
 
 import com.kontakt.sdk.android.ble.configuration.ActivityCheckConfiguration;
 import com.kontakt.sdk.android.ble.configuration.ForceScanConfiguration;
-import com.kontakt.sdk.android.ble.configuration.scan.EddystoneScanContext;
+import com.kontakt.sdk.android.ble.configuration.scan.IBeaconScanContext;
 import com.kontakt.sdk.android.ble.configuration.scan.ScanContext;
 import com.kontakt.sdk.android.ble.connection.OnServiceReadyListener;
 import com.kontakt.sdk.android.ble.device.DeviceProfile;
 import com.kontakt.sdk.android.ble.discovery.BluetoothDeviceEvent;
 import com.kontakt.sdk.android.ble.discovery.EventType;
-import com.kontakt.sdk.android.ble.discovery.eddystone.EddystoneDeviceEvent;
-import com.kontakt.sdk.android.ble.filter.eddystone.EddystoneFilters;
+import com.kontakt.sdk.android.ble.discovery.ibeacon.IBeaconDeviceEvent;
+import com.kontakt.sdk.android.ble.filter.ibeacon.IBeaconFilters;
 import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
-import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
+import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.ui.activity.DistanceRangeActivity;
-import com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity;
+import com.northteam.beaconsscanner.ui.activity.IBeaconDetailsActivity;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-//import com.northteam.beaconsscanner.ui.activity.DistanceRangeActivity;
-
 /**
- * Created by northteam on 07/04/16.
+ * Created by beatrizgomes on 08/04/2016.
  */
-public class EddystoneDetailsScan {
+public class IBeaconsDetailsScan {
 
-    private static final String TAG = "EddystoneDetailsScan";
+    private static final String TAG = "IBeaconDetailsScan";
 
 
     /**
@@ -53,32 +51,35 @@ public class EddystoneDetailsScan {
      */
     public String beaconIdentifier;
     /**
-     * The Distance.
-     */
-    //public double distance;
-    /**
-     * The Rssi mode.
+     * The Rssi mode - array used to save the received RSSI and then determine the Mode of the values.
      */
     public ArrayList<Double> rssiMode = new ArrayList<>();
     /**
-     * The Rssi array.
+     * The Rssi array - array used to save the received RSSI - if allowed (x > mode < y)  .
      */
     public ArrayList<Double> rssiArray = new ArrayList<>();
     /**
-     * The Count.
+     * The Count - used to count how manny times a RSSI signal is throwed out.
      */
-    int count = 0; // variavel usada no metodo calculateDistance();
+    int count = 0;
+    /**
+     * The Context
+     */
     private Context context;
-    CountDownTimer timerCount = new CountDownTimer(5000, 1000) {
+    /**
+     * timerCount to check if connection with beacon was lost
+     */
+    CountDownTimer timerCount = new CountDownTimer(3000, 1000) {
 
         public void onTick(long millisUntilFinished) {
 
         }
 
         public void onFinish() {
-            if (context == EddystoneDetailsActivity.getContext()) {
-                TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
-                rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;<i>sem sinal. . . </i>"));
+
+            if (context == IBeaconDetailsActivity.getContext()) {
+                TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.rssi);
+                rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;<i>sem sinal</i>"));
             } else {
                 TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
                 distanceTextView.setText(Html.fromHtml("<b><i> sem sinal ... </i></b>"));
@@ -90,11 +91,11 @@ public class EddystoneDetailsScan {
     }};
 
     /**
-     * Instantiates a new Eddystone details scan.
+     * Instantiates a new Beacons details scan.
      *
      * @param context the context
      */
-    public EddystoneDetailsScan(Context context) {
+    public IBeaconsDetailsScan(Context context) {
 
         this.context = context;
         deviceManager = new ProximityManager(context);
@@ -103,12 +104,12 @@ public class EddystoneDetailsScan {
 
 
     /**
-     * Instantiates a new Eddystone details scan.
+     * Instantiates a new Beacons details scan.
      *
      * @param context    the context
      * @param identifier the identifier
      */
-    public EddystoneDetailsScan(Context context, String identifier) {
+    public IBeaconsDetailsScan(Context context, String identifier) {
 
         this.beaconIdentifier = identifier;
         this.context = context;
@@ -130,34 +131,33 @@ public class EddystoneDetailsScan {
 
             @Override
             public void onConnectionFailure() {
-                //Utils.showToast(BeaconsScanActivity.this, "Erro durante conexão");
+
             }
         });
-
     }
 
     /**
-     * Gets or create scan context.
+     * Gets or creates scan context.
      *
-     * @return the or create scan context
+     * @return the scan context
      */
     public ScanContext getOrCreateScanContext() {
 
-        EddystoneScanContext eddystoneScanContext;
+        IBeaconScanContext beaconScanContext;
 
-        eddystoneScanContext = new EddystoneScanContext.Builder()
-                .setEventTypes(eventTypes)
-                .setDevicesUpdateCallbackInterval(250)
-                .setUIDFilters(Arrays.asList(
-                        EddystoneFilters.newUIDFilter("f7826da6bc5b71e0893e", beaconIdentifier)
+        beaconScanContext = new IBeaconScanContext.Builder()
+                .setEventTypes(eventTypes) // only specified events we be called on callback
+                .setIBeaconFilters(Arrays.asList(
+                        IBeaconFilters.newDeviceNameFilter(beaconIdentifier)
                 ))
                 .setRssiCalculator(RssiCalculators.DEFAULT)
                 .build();
 
+
         if (scanContext == null) {
             scanContext = new ScanContext.Builder()
                     .setScanMode(ProximityManager.SCAN_MODE_BALANCED)
-                    .setEddystoneScanContext(eddystoneScanContext)
+                    .setIBeaconScanContext(beaconScanContext)
                     .setActivityCheckConfiguration(ActivityCheckConfiguration.DEFAULT)
                     .setForceScanConfiguration(ForceScanConfiguration.DEFAULT)
                     .build();
@@ -172,11 +172,10 @@ public class EddystoneDetailsScan {
      * @param event the event
      */
     public void onDevicesUpdateEvent(BluetoothDeviceEvent event) {
-
         DeviceProfile deviceProfile = event.getDeviceProfile();
         switch (deviceProfile) {
-            case EDDYSTONE:
-                onEddystoneDevicesList((EddystoneDeviceEvent) event);
+            case IBEACON:
+                onIBeaconDevicesList((IBeaconDeviceEvent) event);
                 break;
         }
     }
@@ -184,106 +183,104 @@ public class EddystoneDetailsScan {
     /**
      * @param event
      */
-    private void onEddystoneDevicesList(final EddystoneDeviceEvent event) {
+    private void onIBeaconDevicesList(final IBeaconDeviceEvent event) {
 
-        List<IEddystoneDevice> eddystoneDevices = event.getDeviceList();
-        TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_distance);
-        TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
-
+        List<IBeaconDevice> iBeaconDevices = event.getDeviceList();
+        TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.distance);
+        TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.rssi);
         ImageView imageDistance = (ImageView) ((Activity) context).findViewById(R.id.image_distance);
         TextView distanceRangeTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
 
         double distance;
 
-        for (IEddystoneDevice eddystoneDevice : eddystoneDevices) {
+
+        for (IBeaconDevice iBeaconDevice : iBeaconDevices) {
 
             timerCount.cancel();
             timerCount.start();
 
-            distance = calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
+            distance = calculateDistance(iBeaconDevice.getTxPower(), iBeaconDevice.getRssi());
 
 
-            if (context == EddystoneDetailsActivity.getContext()) {
+            if (context == IBeaconDetailsActivity.getContext()) {
 
-                distanceTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp;"));
+                distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp; "));
 
                 if (distance == -1)
-                    distanceTextView.append(Html.fromHtml("<i>a calibrar...</i>"));
+                    distanceTextView.append(Html.fromHtml("<i>a calibrar . . .</i>"));
                 else
-                    distanceTextView.append(String.format("%.2f cm", distance));
+                    distanceTextView.append(String.format("%.2f m", distance));
 
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
-                rssiTextView.append(String.format("%.2f dBm", eddystoneDevice.getRssi()));
-
+                rssiTextView.append(String.format("%.2f dBm", iBeaconDevice.getRssi()));
 
             } else if (context == DistanceRangeActivity.getContext()) {
 
-
-                distanceRangeTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp; "));
+                distanceRangeTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
 
                 if (distance == -1)
-                    distanceRangeTextView.append(Html.fromHtml("<i>a calibrar...</i>"));
+                    distanceRangeTextView.append(Html.fromHtml("<i>a calibrar . . .</i>"));
                 else {
-                    distance = distance / 100;
+                    //distanceRangeTextView.append(String.format("%.2f m",distance));
 
-                    if (distance >= 0 && distance < 2) {
-                        distanceRangeTextView.setText("Distância: 0m - 2m");
+                    if (distance >= 0 && distance < 1) {
+                        distanceRangeTextView.setText("Distância: 0m - 1m");
                         imageDistance.setImageResource(R.drawable.i4);
-                    } else if (distance >= 2 && distance < 4) {
-                        distanceRangeTextView.setText("Distância: 2m - 4m");
+                    } else if (distance >= 1 && distance < 3) {
+                        distanceRangeTextView.setText("Distância: 1m - 3m");
                         imageDistance.setImageResource(R.drawable.i3);
-                    } else if (distance >= 4 && distance < 6) {
-                        distanceRangeTextView.setText("Distância: 4m - 6m");
+                    } else if (distance >= 3 && distance < 7) {
+                        distanceRangeTextView.setText("Distância: 3m - 7m");
                         imageDistance.setImageResource(R.drawable.i2);
-                    } else if (distance >= 6 && distance < 9) {
-                        distanceRangeTextView.setText("Distância: 6m - 9m");
+                    } else if (distance >= 7 && distance < 12) {
+                        distanceRangeTextView.setText("Distância: 7m - 12m");
                         imageDistance.setImageResource(R.drawable.i1);
-                    } else if (distance >= 9) {
-                        distanceRangeTextView.setText("Distância: > 9m");
+                    } else if (distance >= 12) {
+                        distanceRangeTextView.setText("Distância: > 12m");
                         imageDistance.setImageResource(R.drawable.i0);
                     }
 
+
                 }
             }
+
         }
 
     }
 
     /**
-     * Calculates the suavized distance
+     * Calculate distance.
      *
-     * @param txPower
-     * @param receivedRssi
-     * @return the calculated distance
+     * @param txPower      the tx power
+     * @param receivedRssi the received rssi
      */
     public double calculateDistance(int txPower, double receivedRssi) {
 
-
         Log.i(TAG, "-----------------------");
-        Log.i(TAG, "calculateDistance(): receivedRssi: " + receivedRssi);
 
+
+        Log.i(TAG, "calculateDistance(): receivedRssi: " + receivedRssi);
 
         double rssi = rssiSuavization(receivedRssi);
         Log.i(TAG, "calculateDistance(): rssi suavizado: " + rssi);
 
-        if (rssi == 0.0) {
-            //distanceTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp;a calibrar..."));
-
+        if (rssi == 0) {
+            //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
+            //distanceTextView.append(String.format("a calibrar . . ."));
             return -1.0; // if we cannot determine distance, return -1.
+        }
+
+        double ratio = rssi * 1.0 / txPower;
+        if (ratio < 1.0) {
+            return Math.pow(ratio, 10);
+            //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
+            //distanceTextView.append(String.format("%.2f cm", Math.pow(ratio, 10)));
+
         } else {
-
-            double ratio = rssi * 1.0 / txPower;
-            if (ratio < 1.0) {
-                return Math.pow(ratio, 10);
-                //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
-                //distanceTextView.append(String.format("%.2f cm", Math.pow(ratio, 10)));
-
-            } else {
-                double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
-                //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
-                //distanceTextView.append(String.format("%.2f cm", accuracy));
-                return accuracy;
-            }
+            double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+            //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
+            //distanceTextView.append(String.format("%.2f cm", accuracy));
+            return accuracy;
         }
     }
 
@@ -298,6 +295,7 @@ public class EddystoneDetailsScan {
         double variation = 0, modeValue = 0;
 
         if (rssiMode.size() < 15) {
+
             // Preencher o ArrayList rssiMode() com 15 valores sem qualquer filtro.
             rssiMode.add(rssi);
             count = 0;
@@ -306,11 +304,8 @@ public class EddystoneDetailsScan {
             // modeValue fica com a MODA dos valores de rssi obtidos.
             modeValue = mode();
 
-            Log.i("EddystoneDetailsScan", "rssiSuavization(): moda: " + modeValue);
-
-
             // variation fica com a diferença entre o rssi obtido com a MODA dos Rssi's
-            variation = Math.abs(rssi - modeValue);
+            variation = Math.abs(rssi) - Math.abs(modeValue);
 
             // Janela de valores aceites a serem considerados para o calculo da nova MODA.
             if (variation >= 0 && variation <= 5) {
@@ -318,35 +313,33 @@ public class EddystoneDetailsScan {
                 rssiMode.remove(0);
                 rssiMode.add(rssi);
             } else {
-                Log.i("EddystoneDetailsScan", "rssiSuavization(): receivedRssi > moda_variation (" + variation + ")");
-                // Se o rssi for descartado incrementamos a variavel count.
+                // Se o rssi for descartado a variável count é incrementada.
                 count++;
-                Log.i("EddystoneDetailsScan", "rssiSuavization(): count++");
             }
 
             // modeValue fica com a nova MODA
             modeValue = mode();
 
             // variation fica com a diferença entre o rssi obtido com a nova MODA dos Rssi's
-            variation = Math.abs(rssi - modeValue);
+            variation = Math.abs(rssi) - Math.abs(modeValue);
 
             // Janela de valores aceites a serem considerados para o calculo da Media dos Rssi's.
-            if (variation >= 0 && variation <= 4) {
+            if (variation >= 0 && variation <= 3) {
                 if (rssiArray.size() >= 20)
                     rssiArray.remove(0);
 
                 rssiArray.add(rssi);
-            } else
-                Log.i("EddystoneDetailsScan", "rssiSuavization(): receivedRssi > media_variation (" + variation + ")");
+            }
         }
+
         /**
          * Se count == 5, significa que 5 rssi seguidos foram descartados.
-         * É muito provavél que nos estejamos a deslocar e que estejamos a descartar valores importantes.
-         * Vamos retirar metade dos valores dos ArrayList's de maneira a deixar entrar novos valores para o calculo da nova
+         * É muito provável que nos estejamos a deslocar e que estejamos a descartar valores importantes.
+         * Vamos retirar metade dos valores dos ArrayList's de maneira a deixar entrar novos valores para o cálculo da nova
          * MODA e Média.
          */
         if (count == 5) {
-            //Log.i("EddystoneDetailsScan", "rssiSuavization(): Count =  5 ");
+            Log.i(TAG, "rssiSuavization(): Count =  5 ");
             for (int i = 0; i < 9; i++) {
                 rssiMode.remove(0);
                 if (rssiArray.size() >= 12)
@@ -354,7 +347,7 @@ public class EddystoneDetailsScan {
             }
         }
 
-        //Log.i("EddystoneDetailsScan", "rssiSuavization(): mode: " + modeValue);
+        Log.i(TAG, "rssiSuavization(): mode: " + modeValue);
 
         // Retorna a média dos Rssi's, valor que irá ser usado para o calculo da distancia.
         return averageRssi();
@@ -388,7 +381,7 @@ public class EddystoneDetailsScan {
     /**
      * public double averageRssi() {
      *
-     * @return um double que representa a Média do conjunto de valores presente no ArrayList<Double> rssiArray.
+     * @return Retorna um double que representa a Média do conjunto de valores presente no ArrayList<Double> rssiArray.
      */
     public double averageRssi() {
 

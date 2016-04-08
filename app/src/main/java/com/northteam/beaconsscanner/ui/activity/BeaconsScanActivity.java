@@ -103,7 +103,7 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
                 if (com.kontakt.sdk.android.ble.device.DeviceProfile.IBEACON == child.getDeviceProfile()) {
                     final IBeaconDevice ibeacon = child.getBeaconDevice();
                     Log.i("setOnClick", "IBEACON");
-                    /*
+
                     // Cria intent para a passagem para a atividade seguinte
                     Intent intentDetailsActivity = new Intent(BeaconsScanActivity.this, IBeaconDetailsActivity.class);
                     intentDetailsActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -111,8 +111,7 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
 
                     // Inicia a atividade seguinte
                     startActivity(intentDetailsActivity);
-                    finish();
-                    */
+
 
                 } else if (com.kontakt.sdk.android.ble.device.DeviceProfile.EDDYSTONE == child.getDeviceProfile()) {
 

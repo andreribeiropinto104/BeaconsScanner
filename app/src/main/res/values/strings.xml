@@ -33,6 +33,7 @@
     <string name="time_since_power_up">Time since power up: %1$d seconds</string>
     <string name="telemetry_version">Telemetry version: %1$d</string>
     <string name="title_activity_eddystone_details">EddystoneDetailsActivity</string>
+    <string name="title_activity_ibeacon_details">IBeaconDetailsActivity</string>
 
 
 </resources>

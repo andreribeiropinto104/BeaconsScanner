@@ -17,83 +17,50 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.kontakt.sdk.android.ble.discovery.BluetoothDeviceEvent;
-import com.kontakt.sdk.android.ble.discovery.EventType;
 import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.util.BluetoothUtils;
-import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
+import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.northteam.beaconsscanner.R;
-import com.northteam.beaconsscanner.adapter.monitor.EddystoneDetailsScan;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.northteam.beaconsscanner.adapter.monitor.IBeaconsDetailsScan;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class EddystoneDetailsActivity extends AppCompatActivity implements ProximityManager.ProximityListener {
+public class IBeaconDetailsActivity extends AppCompatActivity implements ProximityManager.ProximityListener {
 
     private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
-    private static final String TAG = "EddyStoneDetailsActivity";
+    private static final String TAG = "IBeaconDetailsActivity";
 
-    /**
-     * The constant context.
-     */
+
     public static Context context;
-    /**
-     * The Tx power text view.
-     */
-    @Bind(R.id.txpower_level)
+    @Bind(R.id.ibeacon_name)
+    public TextView nameTextView;
+    @Bind(R.id.power)
     public TextView txPowerTextView;
-    @Bind(R.id.namespace)
-    public TextView namespaceTextView;
-    @Bind(R.id.instance_id)
-    public TextView instaceTextView;
-    @Bind(R.id.eddystone_rssi)
+    @Bind(R.id.major)
+    public TextView majorTextView;
+    @Bind(R.id.minor)
+    public TextView minorTextView;
+    @Bind(R.id.rssi)
     public TextView rssiTextView;
-    @Bind(R.id.eddystone_distance)
+    @Bind(R.id.distance)
     public TextView distanceTextView;
-
-    //@Bind(R.id.eddystone_proximity)
-    //public TextView proximityTextView;
-    @Bind(R.id.battery_voltage)
+    @Bind(R.id.battery)
     public TextView batteryTextView;
-    @Bind(R.id.eddystone_url)
-    public TextView urlTextView;
+    protected IBeaconDevice ibeacon;
+    protected IBeaconsDetailsScan beaconScan;
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
 
-    //@Bind(R.id.eddystone_temperature)
-    //public TextView temperatureTextView;
-    public ProximityManager deviceManager;
-    public String beaconIdentifier;
-    public double distance;
-    /**
-     * The Eddystone scan.
-     */
-
-    EddystoneDetailsScan eddystoneScan;
-
-    /**
-     * The Eddystone.
-     */
-    IEddystoneDevice eddystone;
-    private List<EventType> eventTypes = new ArrayList<EventType>() {{
-        add(EventType.DEVICES_UPDATE);
-    }};
-
-    /**
-     * Gets context.
-     *
-     * @return the context
-     */
     public static Context getContext() {
         return context;
     }
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_eddystone_details);
+        setContentView(R.layout.activity_ibeacon_details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -103,37 +70,30 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
-
             // Recebe da atividade anterior como parâmetro o dispositivo selecionado
-            eddystone = (IEddystoneDevice) extras.get("EDDYSTONE");
-            //beaconScan = new EddystoneDetailsScan(this, eddystone.getInstanceId());
-            //nameTextView.setText(Html.fromHtml("<b>Nome:</b> &nbsp;&nbsp;" + eddystone.getNamespaceId()));
-            distanceTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp;<i>a calibrar...</i>"));
+            ibeacon = (IBeaconDevice) extras.get("IBEACON");
+            nameTextView.setText(Html.fromHtml("<b>Nome:</b> &nbsp;&nbsp;" + ibeacon.getUniqueId()));
+            distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp; <i>a calibrar . . .</i>"));
+            majorTextView.setText(Html.fromHtml("<b>Major:</b> &nbsp;&nbsp;" + ibeacon.getMajor()));
+            minorTextView.setText(Html.fromHtml("<b>Minor:</b> &nbsp;&nbsp;" + ibeacon.getMinor()));
+            rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;" + ibeacon.getRssi() + " dBm"));
+            txPowerTextView.setText(Html.fromHtml("<b>Tx Power:</b> &nbsp;&nbsp;" + ibeacon.getTxPower()));
+            batteryTextView.setText(Html.fromHtml("<b>Bateria:</b> &nbsp;&nbsp;" + ibeacon.getBatteryPower() + "%"));
+            beaconScan = new IBeaconsDetailsScan(context, ibeacon.getName());
+            //beaconScan.startScan(this);
 
-            namespaceTextView.setText(Html.fromHtml("<b>Namespace:</b> &nbsp;&nbsp;" + eddystone.getNamespaceId()));
-            instaceTextView.setText(Html.fromHtml("<b>Instance:</b> &nbsp;&nbsp;" + eddystone.getInstanceId()));
-            rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
-            rssiTextView.append(String.format("%.2f dBm", eddystone.getRssi()));
-            txPowerTextView.setText(Html.fromHtml("<b>Tx Power:</b> &nbsp;&nbsp;" + eddystone.getTxPower()));
-            batteryTextView.setText(Html.fromHtml("<b>Bateria:</b> &nbsp;&nbsp;" + eddystone.getBatteryVoltage() + "V"));
-            //temperatureTextView.setText(Html.fromHtml("<b>Temperatura:</b> &nbsp;&nbsp;" + eddystone.getTemperature() + "ºC"));
-            urlTextView.setText(Html.fromHtml("<b>Url:</b> &nbsp;&nbsp;" + eddystone.getUrl()));
-
-            beaconIdentifier = eddystone.getInstanceId();
-            eddystoneScan = new EddystoneDetailsScan(context, beaconIdentifier);
-
-
-            Log.i(TAG, "OnCreate(): ");
 
         }
+
+        Log.i(TAG, "OnCreate(): ");
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (extras != null) {
-                    Intent intentRangeActivity = new Intent(EddystoneDetailsActivity.this, DistanceRangeActivity.class);
-                    intentRangeActivity.putExtra("EDDYSTONE", eddystone);
+                    Intent intentRangeActivity = new Intent(IBeaconDetailsActivity.this, DistanceRangeActivity.class);
+                    intentRangeActivity.putExtra("IBEACON", ibeacon);
                     startActivity(intentRangeActivity);
                 } else
                     Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -141,8 +101,6 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
     }
 
     @Override
@@ -183,11 +141,13 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     @Override
     public void onEvent(BluetoothDeviceEvent bluetoothDeviceEvent) {
 
+        Log.i(TAG, "onEvent()");
         switch (bluetoothDeviceEvent.getEventType()) {
             case DEVICES_UPDATE:
-                eddystoneScan.onDevicesUpdateEvent(bluetoothDeviceEvent);
+                beaconScan.onDevicesUpdateEvent(bluetoothDeviceEvent);
                 break;
         }
+
     }
 
     @Override
@@ -199,22 +159,22 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             startActivityForResult(intent, REQUEST_CODE_ENABLE_BLUETOOTH);
         }
 
-        eddystoneScan.startScan(EddystoneDetailsActivity.this);
+        beaconScan.startScan(IBeaconDetailsActivity.this);
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
 
-        eddystoneScan.deviceManager.finishScan();
+        beaconScan.deviceManager.finishScan();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        eddystoneScan.deviceManager.disconnect();
-        eddystoneScan.deviceManager = null;
+        beaconScan.deviceManager.disconnect();
+        beaconScan.deviceManager = null;
         ButterKnife.unbind(this);
     }
-
 }
