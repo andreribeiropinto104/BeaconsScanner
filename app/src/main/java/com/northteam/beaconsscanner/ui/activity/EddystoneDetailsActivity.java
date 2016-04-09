@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,11 +25,17 @@ import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.adapter.monitor.EddystoneDetailsScan;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class EddystoneDetailsActivity extends AppCompatActivity implements ProximityManager.ProximityListener {
 
@@ -40,6 +47,8 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
      * The constant context.
      */
     public static Context context;
+
+    public String fileName;
     /**
      * The Tx power text view.
      */
@@ -215,6 +224,42 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
         eddystoneScan.deviceManager.disconnect();
         eddystoneScan.deviceManager = null;
         ButterKnife.unbind(this);
+    }
+
+    @OnClick(R.id.button_save_log)
+    public void submit() {
+        // TODO ...
+        Log.i(TAG, "onClick()");
+        String text = "teste";
+        File dir = Environment.getExternalStorageDirectory();
+        System.out.println(dir.getName());
+
+        fileName = "log.txt";
+
+        Calendar c = Calendar.getInstance();
+        fileName = c.get(Calendar.YEAR) + "" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "_" + c.get(Calendar.HOUR_OF_DAY) + "" + c.get(Calendar.MINUTE) + ".txt";
+
+
+        File logFile = new File(dir + "/Beacons Scanner/" + fileName);
+
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+        try {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(text);
+            buf.newLine();
+            buf.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
 }

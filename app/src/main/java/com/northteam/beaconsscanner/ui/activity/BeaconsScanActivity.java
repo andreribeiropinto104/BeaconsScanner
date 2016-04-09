@@ -46,6 +46,10 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
 
     private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 1;
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    private static final String TAG = "BeaconsScanActivity";
+
+    private String fileName = "";
+
     /**
      * The Eddystone name.
      */
@@ -54,7 +58,6 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
      * The Scan context.
      */
     public ScanContext scanContext;
-    String TAG = "BeaconsScanActivity";
     @Bind(R.id.list_beacons)
     ExpandableListView listBeacons;
     private BeaconsScanMonitorAdapter beaconsAdapter;
@@ -305,4 +308,6 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
             /*}
         });*/
     }
+
+
 }
