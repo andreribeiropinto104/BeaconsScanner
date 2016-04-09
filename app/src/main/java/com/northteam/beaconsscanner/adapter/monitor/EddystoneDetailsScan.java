@@ -3,6 +3,7 @@ package com.northteam.beaconsscanner.adapter.monitor;
 import android.app.Activity;
 import android.content.Context;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.text.Html;
 import android.util.Log;
 import android.widget.ImageView;
@@ -25,8 +26,13 @@ import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.ui.activity.DistanceRangeActivity;
 import com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -68,6 +74,7 @@ public class EddystoneDetailsScan {
      * The Count.
      */
     int count = 0; // variavel usada no metodo calculateDistance();
+    private String fileName = null;
     private Context context;
     CountDownTimer timerCount = new CountDownTimer(5000, 1000) {
 
@@ -205,16 +212,43 @@ public class EddystoneDetailsScan {
 
             if (context == EddystoneDetailsActivity.getContext()) {
 
+
                 distanceTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp;"));
+
+                String receivedRssi = "";
+                String suavizedRssi = "";
 
                 if (distance == -1)
                     distanceTextView.append(Html.fromHtml("<i>a calibrar...</i>"));
-                else
+                else {
                     distanceTextView.append(String.format("%.2f cm", distance));
+                    receivedRssi = "Received Rssi: " + String.format("%.2f", eddystoneDevice.getRssi());
+                    suavizedRssi = "Suavized Rssi: " + String.format("%.2f", rssiSuavization(eddystoneDevice.getRssi()));
+                }
 
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
                 rssiTextView.append(String.format("%.2f dBm", eddystoneDevice.getRssi()));
 
+                if (fileName != null && distance != -1) {
+                    File dir = Environment.getExternalStorageDirectory();
+
+                    File logFile = new File(dir + "/Beacons Scanner/" + fileName);
+
+                    try {
+                        //BufferedWriter for performance, true to set append to file flag
+                        BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+                        Calendar c = Calendar.getInstance();
+                        String date = c.get(Calendar.YEAR) + "/" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "/" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + " " + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND);
+                        buf.append(date + ": " + receivedRssi + "\n");
+                        buf.append(date + ": " + suavizedRssi + "\n");
+                        buf.append("--------------------------------------\n");
+                        buf.newLine();
+                        buf.close();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
 
             } else if (context == DistanceRangeActivity.getContext()) {
 
@@ -404,6 +438,13 @@ public class EddystoneDetailsScan {
     }
 
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 }
 
 

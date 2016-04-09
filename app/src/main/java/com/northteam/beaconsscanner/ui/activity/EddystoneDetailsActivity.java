@@ -25,9 +25,7 @@ import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.adapter.monitor.EddystoneDetailsScan;
 
-import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -160,6 +158,8 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             case PERMISSION_REQUEST_COARSE_LOCATION: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "coarse location permission granted");
+                    eddystoneScan.startScan(EddystoneDetailsActivity.this);
+
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle("Functionality limited");
@@ -226,15 +226,12 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
         ButterKnife.unbind(this);
     }
 
-    @OnClick(R.id.button_save_log)
+    @OnClick({R.id.imageButton_save_log, R.id.textView_save_log})
     public void submit() {
         // TODO ...
         Log.i(TAG, "onClick()");
         String text = "teste";
         File dir = Environment.getExternalStorageDirectory();
-        System.out.println(dir.getName());
-
-        fileName = "log.txt";
 
         Calendar c = Calendar.getInstance();
         fileName = c.get(Calendar.YEAR) + "" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "_" + c.get(Calendar.HOUR_OF_DAY) + "" + c.get(Calendar.MINUTE) + ".txt";
@@ -250,16 +247,8 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
                 e.printStackTrace();
             }
         }
-        try {
-            //BufferedWriter for performance, true to set append to file flag
-            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append(text);
-            buf.newLine();
-            buf.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
+        eddystoneScan.setFileName(fileName);
     }
 
 }

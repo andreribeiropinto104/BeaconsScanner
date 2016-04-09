@@ -35,5 +35,7 @@
     <string name="title_activity_eddystone_details">EddystoneDetailsActivity</string>
     <string name="title_activity_ibeacon_details">IBeaconDetailsActivity</string>
 
+    <string name="save_log_file">Save Logs to File</string>
+
 
 </resources>
