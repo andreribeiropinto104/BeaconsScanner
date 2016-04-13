@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.kontakt.sdk.android.ble.discovery.BluetoothDeviceEvent;
@@ -25,7 +26,9 @@ import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.adapter.monitor.EddystoneDetailsScan;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -38,7 +41,9 @@ import butterknife.OnClick;
 public class EddystoneDetailsActivity extends AppCompatActivity implements ProximityManager.ProximityListener {
 
     private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 1;
-    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+    private static final int PERMISSION_REQUEST_COARSE_LOCATION = 2;
+    private static final int PERMISSION_REQUEST_WRITE_STORAGE = 3;
+
     private static final String TAG = "EddyStoneDetailsActivity";
 
     /**
@@ -102,6 +107,8 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eddystone_details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.app_name);
+
         setSupportActionBar(toolbar);
 
         context = this;
@@ -152,6 +159,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
     }
 
+
     @Override
     public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
         switch (requestCode) {
@@ -176,6 +184,41 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
                 }
                 return;
             }
+            case PERMISSION_REQUEST_WRITE_STORAGE: {
+                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    Log.d(TAG, "read storage permission granted");
+                    String folderName = "Eddystone";
+                    File directory = new File(Environment.getExternalStorageDirectory() + "/Beacons Scanner", folderName);
+                    if (!directory.exists()) {
+                        try {
+                            if (directory.mkdir()) {
+                                System.out.println("Directory created");
+                            } else {
+                                System.out.println("Directory is not created");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                } else {
+                    final AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                    builder.setTitle("Functionality limited");
+                    // Alterar texto
+                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setPositiveButton(android.R.string.ok, null);
+                    builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
+
+                        @Override
+                        public void onDismiss(DialogInterface dialog) {
+                        }
+
+                    });
+                    builder.show();
+                }
+                return;
+            }
+
         }
     }
 
@@ -226,18 +269,31 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
         ButterKnife.unbind(this);
     }
 
-    @OnClick({R.id.imageButton_save_log, R.id.textView_save_log})
-    public void submit() {
+    //@OnClick({R.id.imageButton_save_log, R.id.textView_save_log})
+    @OnClick(R.id.imageButton_save_log)
+    public void startSaving() {
         // TODO ...
         Log.i(TAG, "onClick()");
-        String text = "teste";
-        File dir = Environment.getExternalStorageDirectory();
+        String folderName = "Eddystone";
+        //File dir = Environment.getExternalStorageDirectory();
 
         Calendar c = Calendar.getInstance();
-        fileName = c.get(Calendar.YEAR) + "" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "_" + c.get(Calendar.HOUR_OF_DAY) + "" + c.get(Calendar.MINUTE) + ".txt";
+        fileName = c.get(Calendar.YEAR) + "" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "_" + c.get(Calendar.HOUR_OF_DAY) + "" + c.get(Calendar.MINUTE) + ".csv";
 
-
-        File logFile = new File(dir + "/Beacons Scanner/" + fileName);
+        File directory = new File(Environment.getExternalStorageDirectory() + "/Beacons Scanner", folderName);
+        System.out.println(directory.getAbsolutePath());
+        if (!directory.exists()) {
+            try {
+                if (directory.mkdir()) {
+                    System.out.println("Directory created");
+                } else {
+                    System.out.println("Directory is not created");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        File logFile = new File(directory + "/" + fileName);
 
         if (!logFile.exists()) {
             try {
@@ -248,7 +304,46 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             }
         }
 
-        eddystoneScan.setFileName(fileName);
+        try {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append("Date; Time; Received RSSI; Suavized RSSI");
+            buf.newLine();
+            buf.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        ImageButton imgBtnSaveLog = (ImageButton) findViewById(R.id.imageButton_save_log);
+        ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log);
+
+        if (imgBtnSaveLog.getVisibility() == View.VISIBLE) {
+            imgBtnSaveLog.setVisibility(View.INVISIBLE);
+
+            imgBtnStopSaveLog.setVisibility(View.VISIBLE);
+
+            eddystoneScan.setFileName(fileName);
+
+        }
+
+
+    }
+
+    @OnClick(R.id.imageButton_stop_save_log)
+    public void stopSaving() {
+
+        ImageButton imgBtnSaveLog = (ImageButton) findViewById(R.id.imageButton_save_log);
+        ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log);
+
+        if (imgBtnStopSaveLog.getVisibility() == View.VISIBLE) {
+            imgBtnSaveLog.setVisibility(View.VISIBLE);
+
+            imgBtnStopSaveLog.setVisibility(View.INVISIBLE);
+
+            eddystoneScan.setFileName(null);
+
+        }
     }
 
 }

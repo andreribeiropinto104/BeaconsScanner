@@ -62,6 +62,7 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ibeacon_details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
 
         context = this;

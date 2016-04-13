@@ -86,7 +86,7 @@ public class EddystoneDetailsScan {
             if (context == EddystoneDetailsActivity.getContext()) {
                 TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;<i>sem sinal. . . </i>"));
-            } else {
+            } else if (context == DistanceRangeActivity.getContext()) {
                 TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
                 distanceTextView.setText(Html.fromHtml("<b><i> sem sinal ... </i></b>"));
             }
@@ -217,13 +217,15 @@ public class EddystoneDetailsScan {
 
                 String receivedRssi = "";
                 String suavizedRssi = "";
+                String folderName = "Eddystone";
+
 
                 if (distance == -1)
                     distanceTextView.append(Html.fromHtml("<i>a calibrar...</i>"));
                 else {
                     distanceTextView.append(String.format("%.2f cm", distance));
-                    receivedRssi = "Received Rssi: " + String.format("%.2f", eddystoneDevice.getRssi());
-                    suavizedRssi = "Suavized Rssi: " + String.format("%.2f", rssiSuavization(eddystoneDevice.getRssi()));
+                    receivedRssi = String.format("%.2f", eddystoneDevice.getRssi());
+                    suavizedRssi = String.format("%.2f", rssiSuavization(eddystoneDevice.getRssi()));
                 }
 
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
@@ -232,16 +234,16 @@ public class EddystoneDetailsScan {
                 if (fileName != null && distance != -1) {
                     File dir = Environment.getExternalStorageDirectory();
 
-                    File logFile = new File(dir + "/Beacons Scanner/" + fileName);
+                    File logFile = new File(dir + "/Beacons Scanner/" + folderName + "/" + fileName);
 
                     try {
                         //BufferedWriter for performance, true to set append to file flag
                         BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
                         Calendar c = Calendar.getInstance();
-                        String date = c.get(Calendar.YEAR) + "/" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "/" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + " " + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND);
-                        buf.append(date + ": " + receivedRssi + "\n");
-                        buf.append(date + ": " + suavizedRssi + "\n");
-                        buf.append("--------------------------------------\n");
+                        String date = c.get(Calendar.YEAR) + "/" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "/" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + ";" + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND) + ";";
+                        buf.append(date);
+                        buf.append(receivedRssi + ";");
+                        buf.append(suavizedRssi);
                         buf.newLine();
                         buf.close();
                     } catch (IOException e) {

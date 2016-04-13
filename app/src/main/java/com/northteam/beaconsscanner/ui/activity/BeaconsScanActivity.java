@@ -81,6 +81,7 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_beacons_scan);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle(R.string.app_name);
         setSupportActionBar(toolbar);
 
         ButterKnife.bind(this);

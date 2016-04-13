@@ -3,6 +3,7 @@ package com.northteam.beaconsscanner.ui.activity;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.bluetooth.BluetoothAdapter;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,7 +20,6 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
@@ -153,27 +153,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.main, menu);
-        return true;
-    }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -185,13 +165,6 @@ public class MainActivity extends AppCompatActivity
 
             Intent intentScanActivity = new Intent(MainActivity.this, BeaconsScanActivity.class);
             startActivity(intentScanActivity);
-
-
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
 
         } else if (id == R.id.nav_share) {
 
@@ -211,7 +184,31 @@ public class MainActivity extends AppCompatActivity
             sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Report bug or give tip - App BeaconsScanner");
             startActivity(sendIntent);
 
+        } else if (id == R.id.nav_about) {
+
+            /*AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+            alertDialogBuilder.setTitle("About Us");
+            alertDialogBuilder.setView(R.layout.content_about_us);
+            alertDialogBuilder.show();*/
+
+            final Dialog dialog = new Dialog(this);
+
+            //dialog.requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
+
+
+            //dialog.setCancelable(false);
+            dialog.setContentView(R.layout.content_about_us);
+            dialog.setCanceledOnTouchOutside(true);
+
+            //TextView text = (TextView) dialog.findViewById(R.id.textView_about);
+            //text.setText("About US");
+            dialog.show();
+            //Intent intentAboutUsActivity = new Intent(MainActivity.this, AboutUsActivity.class);
+            //startActivity(intentAboutUsActivity);
+
+
         }
+
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);

@@ -179,7 +179,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <ImageButton
+        <RelativeLayout
+            android:id="@+id/bodyLayout"
+            android:layout_width="60dp"
+            android:layout_height="wrap_content">
+
+            <ImageButton
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:id="@+id/imageButton_save_log"
@@ -189,7 +194,21 @@
             android:scaleType="fitCenter"
             android:background="@android:color/transparent"
             android:clickable="true"
-            android:paddingLeft="15dp" />
+                android:paddingLeft="15dp" />
+
+            <ImageButton
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:id="@+id/imageButton_stop_save_log"
+                android:layout_gravity="center_horizontal"
+                android:src="@drawable/save_stop"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:background="@android:color/transparent"
+                android:clickable="true"
+                android:paddingLeft="15dp"
+                android:visibility="invisible" />
+        </RelativeLayout>
 
         <TextView
             android:layout_width="wrap_content"
