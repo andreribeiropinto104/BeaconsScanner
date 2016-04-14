@@ -42,7 +42,7 @@ We use some techiniques to smooth the signal and therefore get a more accurate d
         The idea of this app is to share our work and try to get some feedback from you so that we can improve our algorithms.
 
 Thank you for installing our app.</string>
-    <string name="text_content_main">Press the button to start scanning.</string>
+    <string name="text_content_main">Press the button to start scanning</string>
 
     <!-- Menu -->
     <string name="scan_beacons">Scan Beacons</string>
@@ -51,6 +51,7 @@ Thank you for installing our app.</string>
     <string name="sendmail">Send Email</string>
     <string name="aboutus">About Us</string>
     <string name="reportdata">Report Data</string>
+    <string name="fileSelectCsv">Please select .csv file from Beacons Scanner folder</string>
 
 
 </resources>

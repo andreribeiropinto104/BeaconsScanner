@@ -20,9 +20,15 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.kontakt.sdk.android.ble.util.BluetoothUtils;
 import com.northteam.beaconsscanner.R;
 
@@ -35,6 +41,8 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUEST_CODE_ENABLE_BLUETOOTH = 1;
     private static final int PERMISSION_REQUEST_WRITE_STORAGE = 1;
     private static final String TAG = "MainActivity";
+    private static final int FILE_SELECT_CODE = 0;
+
 
 
     @Override
@@ -186,25 +194,18 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_about) {
 
-            /*AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
-            alertDialogBuilder.setTitle("About Us");
-            alertDialogBuilder.setView(R.layout.content_about_us);
-            alertDialogBuilder.show();*/
-
             final Dialog dialog = new Dialog(this);
 
-            //dialog.requestWindowFeature(Window.FEATURE_CUSTOM_TITLE);
-
-
-            //dialog.setCancelable(false);
             dialog.setContentView(R.layout.content_about_us);
             dialog.setCanceledOnTouchOutside(true);
 
-            //TextView text = (TextView) dialog.findViewById(R.id.textView_about);
-            //text.setText("About US");
             dialog.show();
-            //Intent intentAboutUsActivity = new Intent(MainActivity.this, AboutUsActivity.class);
-            //startActivity(intentAboutUsActivity);
+
+
+        } else if (id == R.id.nav_report) {
+
+            showFileChooser();
+
 
 
         }
@@ -222,10 +223,76 @@ public class MainActivity extends AppCompatActivity
         if (!BluetoothUtils.isBluetoothEnabled()) {
             final Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, REQUEST_CODE_ENABLE_BLUETOOTH);
-        } else {
-            //Toast.makeText(this, "Bluetooth Enabled", Toast.LENGTH_LONG).show();
         }
 
+    }
+
+    private void showFileChooser() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Uri uri = Uri.parse(Environment.getDownloadCacheDirectory() + "/Beacons Scanner/");
+        intent.setDataAndType(uri, "*/*");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        try {
+            startActivityForResult(
+                    Intent.createChooser(intent, "Select a File to Upload"),
+                    FILE_SELECT_CODE);
+            System.out.println("Select");
+        } catch (android.content.ActivityNotFoundException ex) {
+            // Potentially direct the user to the Market with a Dialog
+            Toast.makeText(this, "Please install a File Manager.",
+                    Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case FILE_SELECT_CODE:
+                if (resultCode == RESULT_OK) {
+                    // Get the Uri of the selected file
+                    Uri uri = data.getData();
+                    System.out.println(uri);
+                    Log.d(TAG, "File Uri: " + uri.toString());
+                    // Get the path
+                    String path = FileUtils.getPath(this, uri);
+                    Log.d(TAG, "File Path: " + path);
+                    // Get the file instance
+                    File file = new File(path);
+                    // Initiate the upload
+
+                    if (file.getName().substring(file.getName().lastIndexOf(".") + 1).compareTo("csv") == 0) {
+                        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                        sendIntent.setType("plain/text");
+                        sendIntent.setData(Uri.parse("northteamsoftware@gmail.com"));
+                        sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
+                        sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"northteamsoftware@gmail.com"});
+                        sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Report log");
+                        sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
+                        startActivity(sendIntent);
+                    } else {
+                        LayoutInflater inflater = getLayoutInflater();
+                        // Inflate the Layout
+                        View layout = inflater.inflate(R.layout.custom_toast,
+                                (ViewGroup) findViewById(R.id.custom_toast_layout));
+
+                        TextView text = (TextView) layout.findViewById(R.id.textToShow);
+                        // Set the Text to show in TextView
+                        text.setText(R.string.fileSelectCsv);
+
+                        Toast toast = new Toast(getApplicationContext());
+                        toast.setGravity(Gravity.BOTTOM, 0, 400);
+                        toast.setDuration(Toast.LENGTH_LONG);
+                        toast.setView(layout);
+                        toast.show();
+
+                    }
+
+
+                }
+                break;
+        }
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
 }

@@ -41,6 +41,14 @@ Thank you for installing our app.</string>
     <string name="sendmail">Contacte-nos</string>
     <string name="shareapp">Partilhar Aplicação</string>
     <string name="reportdata">Reportar Dados</string>
+    <string name="communicate">Comunicação</string>
+    <string name="fileSelectCsv">Selecione um ficheiro .csv da pasta Beacons Scanner</string>
+    <string name="aboutus">Sobre nós</string>
+    <string name="sendmail">Contacte-nos</string>
+    <string name="shareapp">Partilhar Aplicação</string>
+    <string name="scan_beacons">Procurar Beacons</string>
+    <string name="text_content_main">Pressione o botão para iniciar a procura</string>
+    <string name="reportdata">Reportar Dados</string>
 
 
 </resources>
