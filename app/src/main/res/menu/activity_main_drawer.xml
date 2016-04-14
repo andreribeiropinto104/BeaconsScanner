@@ -5,24 +5,28 @@
         <item
             android:id="@+id/nav_scanBeacons"
             android:icon="@drawable/ic_bluetooth_searching_black_48dp"
-            android:title="Scan Beacons" />
+            android:title="@string/scan_beacons" />
 
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="@string/communicate">
         <menu>
             <item
                 android:id="@+id/nav_share"
                 android:icon="@drawable/ic_share_black_48dp"
-                android:title="Share App" />
+                android:title="@string/shareapp" />
             <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_send_black_48dp"
-                android:title="Send Mail" />
+                android:title="@string/sendmail" />
+            <item
+                android:id="@+id/nav_report"
+                android:icon="@drawable/ic_report_black_48dp"
+                android:title="@string/reportdata" />
             <item
                 android:id="@+id/nav_about"
                 android:icon="@drawable/ic_info_black_48dp"
-                android:title="About Us" />
+                android:title="@string/aboutus" />
         </menu>
     </item>
 

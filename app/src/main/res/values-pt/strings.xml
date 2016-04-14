@@ -34,6 +34,13 @@ We use some techiniques to smooth the signal and therefore get a more accurate d
         The idea of this app is to share our work and try to get some feedback from you so that we can improve our algorithms.
 
 Thank you for installing our app.</string>
+    <string name="text_content_main">Pressione o botão para iniciar o procura.</string>
+    <string name="aboutus">Sobre Nós</string>
+    <string name="communicate">Comunicação</string>
+    <string name="scan_beacons">Procurar Beacons</string>
+    <string name="sendmail">Contacte-nos</string>
+    <string name="shareapp">Partilhar Aplicação</string>
+    <string name="reportdata">Reportar Dados</string>
 
 
 </resources>

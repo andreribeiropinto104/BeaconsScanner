@@ -36,5 +36,13 @@ We use some techiniques to smooth the signal and therefore get a more accurate d
 
 Thank you for installing our app.</string>
 
+    <string name="text_content_main">Press the button to start scanning.</string>
+    <string name="aboutus">About Us</string>
+    <string name="communicate">Communicate</string>
+    <string name="scan_beacons">Scan Beacons</string>
+    <string name="sendmail">Send Email</string>
+    <string name="shareapp">Share App</string>
+    <string name="reportdata">Report Data</string>
+
 
 </resources>
