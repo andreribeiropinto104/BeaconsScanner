@@ -44,13 +44,6 @@ Thank you for installing our app.</string>
     <string name="shareapp">Share App</string>
     <string name="reportdata">Report Data</string>
     <string name="fileSelectCsv">Please select .csv file from Beacons Scanner folder</string>
-    <string name="communicate">Communicate</string>
-    <string name="aboutus">About Us</string>
-    <string name="sendmail">Send Email</string>
-    <string name="shareapp">Share App</string>
-    <string name="scan_beacons">Scan Beacons</string>
-    <string name="text_content_main">Press the button to start scanning</string>
-    <string name="reportdata">Report Data</string>
 
 
 </resources>

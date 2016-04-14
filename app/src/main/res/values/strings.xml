@@ -51,7 +51,10 @@ Thank you for installing our app.</string>
     <string name="sendmail">Send Email</string>
     <string name="aboutus">About Us</string>
     <string name="reportdata">Report Data</string>
+
+    <!-- Alert -->
     <string name="fileSelectCsv">Please select .csv file from Beacons Scanner folder</string>
+    <string name="folderEmpty">Log folder is empty. First create log files</string>
 
 
 </resources>

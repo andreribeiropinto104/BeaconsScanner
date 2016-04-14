@@ -25,6 +25,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -229,19 +230,45 @@ public class MainActivity extends AppCompatActivity
 
     private void showFileChooser() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        Uri uri = Uri.parse(Environment.getDownloadCacheDirectory() + "/Beacons Scanner/");
-        intent.setDataAndType(uri, "*/*");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        Uri uri = Uri.parse(Environment.getExternalStorageDirectory() + "/Beacons Scanner/");
 
-        try {
-            startActivityForResult(
-                    Intent.createChooser(intent, "Select a File to Upload"),
-                    FILE_SELECT_CODE);
-            System.out.println("Select");
-        } catch (android.content.ActivityNotFoundException ex) {
-            // Potentially direct the user to the Market with a Dialog
-            Toast.makeText(this, "Please install a File Manager.",
-                    Toast.LENGTH_SHORT).show();
+        File directory = new File(uri.toString());
+        File[] contents = directory.listFiles();
+
+        if (!(contents.length == 0)) {
+
+            intent.setDataAndType(uri, "*/*");
+
+            intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+            try {
+                startActivityForResult(
+                        Intent.createChooser(intent, "Select a File to Upload"),
+                        FILE_SELECT_CODE);
+                System.out.println("Select");
+            } catch (android.content.ActivityNotFoundException ex) {
+                // Potentially direct the user to the Market with a Dialog
+                Toast.makeText(this, "Please install a File Manager.",
+                        Toast.LENGTH_SHORT).show();
+            }
+
+        } else {
+
+            LayoutInflater inflater = getLayoutInflater();
+            // Inflate the Layout
+            View layout = inflater.inflate(R.layout.custom_toast,
+                    (ViewGroup) findViewById(R.id.custom_toast_layout));
+            ImageView imgCSV = (ImageView) layout.findViewById(R.id.imgToast);
+            imgCSV.setImageResource(R.drawable.ic_folder_open_black_48dp);
+            TextView text = (TextView) layout.findViewById(R.id.textToShow);
+            // Set the Text to show in TextView
+            text.setText(R.string.folderEmpty);
+
+            Toast toast = new Toast(getApplicationContext());
+            toast.setGravity(Gravity.BOTTOM, 0, 400);
+            toast.setDuration(Toast.LENGTH_LONG);
+            toast.setView(layout);
+            toast.show();
         }
     }
 
@@ -275,7 +302,8 @@ public class MainActivity extends AppCompatActivity
                         // Inflate the Layout
                         View layout = inflater.inflate(R.layout.custom_toast,
                                 (ViewGroup) findViewById(R.id.custom_toast_layout));
-
+                        ImageView imgCSV = (ImageView) layout.findViewById(R.id.imgToast);
+                        imgCSV.setImageResource(R.drawable.csv_icon);
                         TextView text = (TextView) layout.findViewById(R.id.textToShow);
                         // Set the Text to show in TextView
                         text.setText(R.string.fileSelectCsv);

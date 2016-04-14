@@ -8,7 +8,7 @@
     android:background="#00b8ff">
 
     <ImageView
-        android:src="@drawable/csv_icon"
+        android:id="@+id/imgToast"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginRight="8dp" />
