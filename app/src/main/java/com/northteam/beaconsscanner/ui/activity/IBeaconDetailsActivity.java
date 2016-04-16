@@ -91,7 +91,7 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
             // Recebe da atividade anterior como parâmetro o dispositivo selecionado
             ibeacon = (IBeaconDevice) extras.get("IBEACON");
             nameTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.device_name) + ":</b> &nbsp;&nbsp;" + ibeacon.getUniqueId()));
-            distanceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.distance) + ":</b> &nbsp;&nbsp; <i>" + this.getString(R.string.calibrating) + "</i>"));
+            distanceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.distance) + ":</b> &nbsp;&nbsp; <i>" + this.getString(R.string.calibrating) + "...</i>"));
             majorTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.major) + ":</b> &nbsp;&nbsp;" + ibeacon.getMajor()));
             minorTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.minor) + ":</b> &nbsp;&nbsp;" + ibeacon.getMinor()));
             rssiTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;" + ibeacon.getRssi() + " dBm"));

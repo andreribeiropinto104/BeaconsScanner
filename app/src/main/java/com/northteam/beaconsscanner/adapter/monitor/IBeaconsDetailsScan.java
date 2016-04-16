@@ -155,7 +155,7 @@ public class IBeaconsDetailsScan {
         beaconScanContext = new IBeaconScanContext.Builder()
                 .setEventTypes(eventTypes) // only specified events we be called on callback
                 .setIBeaconFilters(Arrays.asList(
-                        IBeaconFilters.newDeviceNameFilter(beaconIdentifier)
+                        IBeaconFilters.newUniqueIdFilter(beaconIdentifier)
                 ))
                 .setRssiCalculator(RssiCalculators.DEFAULT)
                 .build();
@@ -200,7 +200,6 @@ public class IBeaconsDetailsScan {
 
         double distance;
 
-
         for (IBeaconDevice iBeaconDevice : iBeaconDevices) {
 
             timerCount.cancel();
@@ -218,7 +217,7 @@ public class IBeaconsDetailsScan {
                 String folderName = "IBeacon";
 
                 if (distance == -1)
-                    distanceTextView.append(Html.fromHtml("<i>" + context.getString(R.string.calibrating) + "</i>"));
+                    distanceTextView.append(Html.fromHtml("<i>" + context.getString(R.string.calibrating) + "...</i>"));
                 else {
                     distanceTextView.append(String.format("%.2f m", distance));
                     receivedRssi = String.format("%.2f", iBeaconDevice.getRssi());

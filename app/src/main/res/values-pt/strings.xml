@@ -54,7 +54,7 @@
     <string name="far">Longe</string>
     <string name="immediate">Muito Perto</string>
     <string name="calibrating">a calibrar</string>
-    <string name="noSignal">sem sinal</string>
+    <string name="noSignal"> </string>
 
 
 </resources>
