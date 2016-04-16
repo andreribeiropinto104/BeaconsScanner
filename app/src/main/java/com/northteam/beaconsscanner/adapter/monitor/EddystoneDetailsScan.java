@@ -36,10 +36,11 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
-//import com.northteam.beaconsscanner.ui.activity.DistanceRangeActivity;
 
 /**
- * Created by northteam on 07/04/16.
+ * Beacons Scanner - EddystoneDetailsScan, file created on 08/04/2016
+ * @author beatrizgomes
+ * @author andrepinto
  */
 public class EddystoneDetailsScan {
 
@@ -58,6 +59,7 @@ public class EddystoneDetailsScan {
      * The Beacon identifier.
      */
     public String beaconIdentifier;
+    public String namespaceIdentifier;
     /**
      * The Distance.
      */
@@ -85,7 +87,7 @@ public class EddystoneDetailsScan {
         public void onFinish() {
             if (context == EddystoneDetailsActivity.getContext()) {
                 TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
-                rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;<i>sem sinal. . . </i>"));
+                rssiTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;<i>" + context.getString(R.string.noSignal) + "...</i>"));
             } else if (context == DistanceRangeActivity.getContext()) {
                 TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
                 distanceTextView.setText(Html.fromHtml("<b><i> sem sinal ... </i></b>"));
@@ -115,11 +117,13 @@ public class EddystoneDetailsScan {
      * @param context    the context
      * @param identifier the identifier
      */
-    public EddystoneDetailsScan(Context context, String identifier) {
+    public EddystoneDetailsScan(Context context, String identifier, String namespace) {
 
         this.beaconIdentifier = identifier;
+        this.namespaceIdentifier = namespace;
         this.context = context;
         deviceManager = new ProximityManager(context);
+
     }
 
     /**
@@ -156,7 +160,7 @@ public class EddystoneDetailsScan {
                 .setEventTypes(eventTypes)
                 .setDevicesUpdateCallbackInterval(250)
                 .setUIDFilters(Arrays.asList(
-                        EddystoneFilters.newUIDFilter("f7826da6bc5b71e0893e", beaconIdentifier)
+                        EddystoneFilters.newUIDFilter(namespaceIdentifier, beaconIdentifier)
                 ))
                 .setRssiCalculator(RssiCalculators.DEFAULT)
                 .build();
@@ -213,7 +217,7 @@ public class EddystoneDetailsScan {
             if (context == EddystoneDetailsActivity.getContext()) {
 
 
-                distanceTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp;"));
+                distanceTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b>&nbsp;&nbsp;"));
 
                 String receivedRssi = "";
                 String suavizedRssi = "";
@@ -221,7 +225,7 @@ public class EddystoneDetailsScan {
 
 
                 if (distance == -1)
-                    distanceTextView.append(Html.fromHtml("<i>a calibrar...</i>"));
+                    distanceTextView.append(Html.fromHtml("<i>" + context.getString(R.string.calibrating) + "...</i>"));
                 else {
                     distanceTextView.append(String.format("%.2f cm", distance));
                     receivedRssi = String.format("%.2f", eddystoneDevice.getRssi());
@@ -255,10 +259,10 @@ public class EddystoneDetailsScan {
             } else if (context == DistanceRangeActivity.getContext()) {
 
 
-                distanceRangeTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp; "));
+                distanceRangeTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b>&nbsp;&nbsp; "));
 
                 if (distance == -1)
-                    distanceRangeTextView.append(Html.fromHtml("<i>a calibrar...</i>"));
+                    distanceRangeTextView.append(Html.fromHtml("<i>" + context.getString(R.string.calibrating) + "...</i>"));
                 else {
                     distance = distance / 100;
 

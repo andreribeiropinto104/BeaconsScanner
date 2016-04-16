@@ -31,7 +31,10 @@ import java.util.HashMap;
 import java.util.List;
 
 /**
- * Created by beatrizgomes on 08/04/2016.
+ * Beacons Scanner - IBeaconDetailsScan, file created on 08/04/2016
+ *
+ * @author beatrizgomes
+ * @author andrepinto
  */
 public class IBeaconsDetailsScan {
 
@@ -50,6 +53,7 @@ public class IBeaconsDetailsScan {
      * The Beacon identifier.
      */
     public String beaconIdentifier;
+    public String namespaceIdentifier;
     /**
      * The Rssi mode - array used to save the received RSSI and then determine the Mode of the values.
      */
@@ -66,6 +70,9 @@ public class IBeaconsDetailsScan {
      * The Context
      */
     private Context context;
+
+    private String fileName = null;
+
     /**
      * timerCount to check if connection with beacon was lost
      */
@@ -79,7 +86,7 @@ public class IBeaconsDetailsScan {
 
             if (context == IBeaconDetailsActivity.getContext()) {
                 TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.rssi);
-                rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;<i>sem sinal</i>"));
+                rssiTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;<i>" + context.getString(R.string.noSignal) + "</i>"));
             } else {
                 TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
                 distanceTextView.setText(Html.fromHtml("<b><i> sem sinal ... </i></b>"));
@@ -204,22 +211,29 @@ public class IBeaconsDetailsScan {
 
             if (context == IBeaconDetailsActivity.getContext()) {
 
-                distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp; "));
+                distanceTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b> &nbsp;&nbsp; "));
+
+                String receivedRssi = "";
+                String suavizedRssi = "";
+                String folderName = "IBeacon";
 
                 if (distance == -1)
-                    distanceTextView.append(Html.fromHtml("<i>a calibrar . . .</i>"));
-                else
+                    distanceTextView.append(Html.fromHtml("<i>" + context.getString(R.string.calibrating) + "</i>"));
+                else {
                     distanceTextView.append(String.format("%.2f m", distance));
+                    receivedRssi = String.format("%.2f", iBeaconDevice.getRssi());
+                    suavizedRssi = String.format("%.2f", rssiSuavization(iBeaconDevice.getRssi()));
+                }
 
-                rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
+                rssiTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;"));
                 rssiTextView.append(String.format("%.2f dBm", iBeaconDevice.getRssi()));
 
             } else if (context == DistanceRangeActivity.getContext()) {
 
-                distanceRangeTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
+                distanceRangeTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b> &nbsp;&nbsp;"));
 
                 if (distance == -1)
-                    distanceRangeTextView.append(Html.fromHtml("<i>a calibrar . . .</i>"));
+                    distanceRangeTextView.append(Html.fromHtml("<i>" + context.getString(R.string.calibrating) + " ...</i>"));
                 else {
                     //distanceRangeTextView.append(String.format("%.2f m",distance));
 
@@ -397,6 +411,13 @@ public class IBeaconsDetailsScan {
     }
 
 
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String fileName) {
+        this.fileName = fileName;
+    }
 }
 
 

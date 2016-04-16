@@ -8,40 +8,53 @@
     <string name="major">Major</string>
     <string name="minor">Minor</string>
     <string name="beacon_unique_id">Beacon Id</string>
-    <string name="profile">Perfil</string>
     <string name="rssi">Rssi</string>
     <string name="power">Tx Power</string>
-    <string name="proximity">Proximidade</string>
+    <string name="proximity">Proximidade:</string>
 
 
     <!-- EDDYSTONE -->
-    <string name="namespace">Namespace: %1$s</string>
-    <string name="instance">Instance: %1$s</string>
-    <string name="url">Url: %1$s</string>
-    <string name="tx_power_level">Potência: %1$d dBm</string>
-    <string name="temperature">Temperatura: %1$f \u00b0C</string>
-    <string name="battery_voltage">Bateria: %1$d mV</string>
-    <string name="pdu_count">Pdu count: %1$d</string>
-    <string name="time_since_power_up">Time since power up: %1$d seconds</string>
-    <string name="telemetry_version">Telemetry version: %1$d</string>
-    <string name="title_activity_eddystone_details">EddystoneDetailsActivity</string>
-    <string name="title_activity_ibeacon_details">IBeaconDetailsActivity</string>
+    <string name="namespace">Namespace</string>
+    <string name="instance">Instance</string>
+    <string name="url">Url: </string>
+    <string name="tx_power_level">Potência:</string>
+    <string name="battery_voltage">Bateria</string>
+
 
     <string name="save_log_file">Guardar Logs para Ficheiro</string>
 
-    <string name="text_about_us">Hi there, we are computer engineering master\'s students working on our master thesis. It studies BLE and its potential. We developed this app to detect BLE beacons and based on rssi value that they transmit we can calculated the distance from our device to the beacon.
-We use some techiniques to smooth the signal and therefore get a more accurate distance.
-        The idea of this app is to share our work and try to get some feedback from you so that we can improve our algorithms.
-
-Thank you for installing our app.</string>
-    <string name="text_content_main">Pressione o botão para iniciar o procura.</string>
+    <string name="text_about_us">Olá, nós somos alunos do mestrado em Engenharia Informática a desenvolver um projeto de tese. Projeto esse que estuda BLE e o seu potencial.
+        Desenvolvemos esta aplicação para a deteção de beacons BLE e baseado no valor RSSI que eles transmitem, calculamos a distância do nosso dispositivo até ao beacon.
+        Usamos algumas técnicas para suavizar o sinal recebido e dessa forma obter um valor para distância estimada mais aproximado da realidade.
+        Esta aplicação tem como propósito a partilha do nosso trabalho e tentar obter algum feedback da parte dos utilizadores de forma a melhorar os nossos algoritmos.
+        \n\nEstamos disponíveis para contacto através do email indicado no menu principal, ou através da opção \'Contacte-nos\'.
+        \n\n\n<i>Obrigado por instalar a nossa aplicação.</i>\n\n</string>
+    <string name="text_content_main">Pressione o botão para iniciar a procura</string>
     <string name="aboutus">Sobre Nós</string>
-    <string name="communicate">Comunicação</string>
     <string name="scan_beacons">Procurar Beacons</string>
+    <string name="communicate">Comunicação</string>
+
     <string name="sendmail">Contacte-nos</string>
     <string name="shareapp">Partilhar Aplicação</string>
     <string name="reportdata">Reportar Dados</string>
     <string name="fileSelectCsv">Selecione um ficheiro .csv da pasta Beacons Scanner</string>
+    <string name="fileSavedEddystone">Ficheiro de Log guardado na pasta Beacons Scanner/Eddystone/</string>
+    <string name="fileSavedIbeacon">Ficheiro de Log guardado na pasta Beacons Scanner/IBeacon</string>
+    <string name="folderEmpty">Pasta de logs está vazia. Primeiro crie ficheiros de log</string>
+    <string name="stop_save_log_file">Parar de gravar logs para ficheiro</string>
+    <string name="needsBluetoothPermissions">Esta aplicação necessita de permissão de acesso à localização</string>
+    <string name="limitedPermissions">Funcionalidades limitadas</string>
+    <string name="bluetoothPermissions">Por favor garanta acesso à localização para que a aplicação possa detetar os beacons.</string>
+    <string name="noBluetoothPermissions">Visto o acesso à localização não ter sido garantido, a aplicação não vai ser capaz de detetar os beacons.</string>
+    <string name="needsStoragePermissions">Esta aplicação necessita de permissão de acesso aos ficheiros</string>
+    <string name="noStoragePermissions">Visto o acesso aos ficheiros não ter sido garantido, a aplicação não vai ser capaz de criar ficheiros de log.</string>
+    <string name="storagePermissions">Por favor garanta acesso à localização para que a aplicação possa criar ficheiros de log.</string>
+    <string name="shareAppText">Olá, faz download desta aplicação! </string>
+    <string name="near">Perto</string>
+    <string name="far">Longe</string>
+    <string name="immediate">Muito Perto</string>
+    <string name="calibrating">a calibrar</string>
+    <string name="noSignal">sem sinal</string>
 
 
 </resources>

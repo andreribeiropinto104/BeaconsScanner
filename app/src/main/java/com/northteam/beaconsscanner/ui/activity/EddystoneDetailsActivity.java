@@ -8,15 +8,18 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Environment;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.kontakt.sdk.android.ble.discovery.BluetoothDeviceEvent;
 import com.kontakt.sdk.android.ble.discovery.EventType;
@@ -77,6 +80,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     //public TextView temperatureTextView;
     public ProximityManager deviceManager;
     public String beaconIdentifier;
+    public String namespaceIdentifier;
     public double distance;
     /**
      * The Eddystone scan.
@@ -122,39 +126,26 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             eddystone = (IEddystoneDevice) extras.get("EDDYSTONE");
             //beaconScan = new EddystoneDetailsScan(this, eddystone.getInstanceId());
             //nameTextView.setText(Html.fromHtml("<b>Nome:</b> &nbsp;&nbsp;" + eddystone.getNamespaceId()));
-            distanceTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp;<i>a calibrar...</i>"));
+            distanceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.distance) + ":</b>&nbsp;&nbsp;<i>" + this.getString(R.string.calibrating) + "...</i>"));
 
-            namespaceTextView.setText(Html.fromHtml("<b>Namespace:</b> &nbsp;&nbsp;" + eddystone.getNamespaceId()));
-            instaceTextView.setText(Html.fromHtml("<b>Instance:</b> &nbsp;&nbsp;" + eddystone.getInstanceId()));
-            rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
+            namespaceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.namespace) + ":</b> &nbsp;&nbsp;" + eddystone.getNamespaceId()));
+            instaceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.instance) + ":</b> &nbsp;&nbsp;" + eddystone.getInstanceId()));
+            rssiTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.rssi) + "</b> &nbsp;&nbsp;"));
             rssiTextView.append(String.format("%.2f dBm", eddystone.getRssi()));
-            txPowerTextView.setText(Html.fromHtml("<b>Tx Power:</b> &nbsp;&nbsp;" + eddystone.getTxPower()));
-            batteryTextView.setText(Html.fromHtml("<b>Bateria:</b> &nbsp;&nbsp;" + eddystone.getBatteryVoltage() + "V"));
-            //temperatureTextView.setText(Html.fromHtml("<b>Temperatura:</b> &nbsp;&nbsp;" + eddystone.getTemperature() + "ºC"));
+            txPowerTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.power) + ":</b> " + "&nbsp;&nbsp;" + eddystone.getTxPower()));
+            batteryTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.battery_voltage) + ":</b> &nbsp;&nbsp;" + eddystone.getBatteryVoltage() + " V"));
             urlTextView.setText(Html.fromHtml("<b>Url:</b> &nbsp;&nbsp;" + eddystone.getUrl()));
+            namespaceIdentifier = eddystone.getNamespaceId();
 
             beaconIdentifier = eddystone.getInstanceId();
-            eddystoneScan = new EddystoneDetailsScan(context, beaconIdentifier);
+            eddystoneScan = new EddystoneDetailsScan(context, beaconIdentifier, namespaceIdentifier);
 
 
             Log.i(TAG, "OnCreate(): ");
 
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (extras != null) {
-                    Intent intentRangeActivity = new Intent(EddystoneDetailsActivity.this, DistanceRangeActivity.class);
-                    intentRangeActivity.putExtra("EDDYSTONE", eddystone);
-                    startActivity(intentRangeActivity);
-                } else
-                    Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                            .setAction("Action", null).show();
-            }
-        });
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
 
     }
@@ -170,8 +161,8 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setTitle(R.string.limitedPermissions);
+                    builder.setMessage(R.string.noBluetoothPermissions);
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -203,9 +194,9 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
+                    builder.setTitle(R.string.limitedPermissions);
                     // Alterar texto
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setMessage(R.string.noStoragePermissions);
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -275,7 +266,6 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
         // TODO ...
         Log.i(TAG, "onClick()");
         String folderName = "Eddystone";
-        //File dir = Environment.getExternalStorageDirectory();
 
         Calendar c = Calendar.getInstance();
         fileName = c.get(Calendar.YEAR) + "" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "_" + c.get(Calendar.HOUR_OF_DAY) + "" + c.get(Calendar.MINUTE) + ".csv";
@@ -317,9 +307,11 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
         ImageButton imgBtnSaveLog = (ImageButton) findViewById(R.id.imageButton_save_log);
         ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log);
+        TextView txtSave = (TextView) findViewById(R.id.textView_save_log);
 
         if (imgBtnSaveLog.getVisibility() == View.VISIBLE) {
             imgBtnSaveLog.setVisibility(View.INVISIBLE);
+            txtSave.setText(R.string.stop_save_log_file);
 
             imgBtnStopSaveLog.setVisibility(View.VISIBLE);
 
@@ -335,6 +327,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
         ImageButton imgBtnSaveLog = (ImageButton) findViewById(R.id.imageButton_save_log);
         ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log);
+        TextView txtSave = (TextView) findViewById(R.id.textView_save_log);
 
         if (imgBtnStopSaveLog.getVisibility() == View.VISIBLE) {
             imgBtnSaveLog.setVisibility(View.VISIBLE);
@@ -342,6 +335,22 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             imgBtnStopSaveLog.setVisibility(View.INVISIBLE);
 
             eddystoneScan.setFileName(null);
+
+            LayoutInflater inflater = getLayoutInflater();
+            // Inflate the Layout
+            View layout = inflater.inflate(R.layout.custom_toast,
+                    (ViewGroup) findViewById(R.id.custom_toast_layout));
+            ImageView imgCSV = (ImageView) layout.findViewById(R.id.imgToast);
+            imgCSV.setImageResource(R.drawable.ic_insert_drive_file_black_48dp);
+            TextView textToast = (TextView) layout.findViewById(R.id.textToShow);
+            // Set the Text to show in TextView
+            textToast.setText(R.string.fileSavedEddystone);
+            txtSave.setText(R.string.save_log_file);
+            Toast toast = new Toast(getApplicationContext());
+            toast.setGravity(Gravity.BOTTOM, 0, 400);
+            toast.setDuration(Toast.LENGTH_LONG);
+            toast.setView(layout);
+            toast.show();
 
         }
     }

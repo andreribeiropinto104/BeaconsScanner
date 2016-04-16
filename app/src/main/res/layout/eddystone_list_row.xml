@@ -94,13 +94,8 @@
             android:id="@+id/proximity"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/proximity" />
-
-        <TextView
-            android:id="@+id/eddystone_list_distance"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Distância" />
+            android:text="@string/proximity"
+            android:paddingBottom="10dp" />
 
     </LinearLayout>
 </LinearLayout>

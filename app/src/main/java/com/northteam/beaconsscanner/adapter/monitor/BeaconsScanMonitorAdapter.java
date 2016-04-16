@@ -22,7 +22,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by beatrizgomes on 02/12/15.
+ * @author beatrizgomes
+ * @author andrepinto
  */
 public class BeaconsScanMonitorAdapter extends BaseExpandableListAdapter {
 
@@ -171,17 +172,17 @@ public class BeaconsScanMonitorAdapter extends BaseExpandableListAdapter {
             IBeaconDevice device = child.getBeaconDevice();
             final IBeaconListViewHolder childViewHolder = (IBeaconListViewHolder) convertView.getTag();
 
-            childViewHolder.nameTextView.setText(String.format("Device Name: %s", device.getUniqueId()));
-            childViewHolder.rssiTextView.setText(String.format("Rssi: %s", device.getRssi()));
+            childViewHolder.nameTextView.setText(String.format("%s: %s", context.getString(R.string.device_name), device.getUniqueId()));
+            childViewHolder.rssiTextView.setText(String.format("%s: %s", context.getString(R.string.rssi), device.getRssi()));
             switch (device.getProximity().toString()) {
                 case "FAR":
-                    childViewHolder.proximityTextView.setText(String.format("Proximidade: Longe"));
+                    childViewHolder.proximityTextView.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.far)));
                     break;
                 case "NEAR":
-                    childViewHolder.proximityTextView.setText(String.format("Proximidade: Perto"));
+                    childViewHolder.proximityTextView.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.near)));
                     break;
                 case "IMMEDIATE":
-                    childViewHolder.proximityTextView.setText(String.format("Proximidade: Muito Perto"));
+                    childViewHolder.proximityTextView.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.immediate)));
                     break;
             }
 
@@ -196,18 +197,18 @@ public class BeaconsScanMonitorAdapter extends BaseExpandableListAdapter {
             EddystoneItemViewHolder viewHolder = (EddystoneItemViewHolder) convertView.getTag();
 
             Context context = convertView.getContext();
-            viewHolder.instance.setText(context.getString(R.string.instance, eddystoneDevice.getInstanceId()));
+            viewHolder.instance.setText(context.getString(R.string.instance) + eddystoneDevice.getInstanceId());
             viewHolder.rssi.setText(String.format("Rssi: %.2f", eddystoneDevice.getRssi()));
-            viewHolder.distance.setText(String.format("Distância: %.2f", eddystoneDevice.getDistance()));
             switch (eddystoneDevice.getProximity().toString()) {
                 case "FAR":
-                    viewHolder.proximity.setText(String.format("Proximidade: Longe"));
+
+                    viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.far)));
                     break;
                 case "NEAR":
-                    viewHolder.proximity.setText(String.format("Proximidade: Perto"));
+                    viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.near)));
                     break;
                 case "IMMEDIATE":
-                    viewHolder.proximity.setText(String.format("Proximidade: Muito Perto"));
+                    viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.immediate)));
                     break;
             }
 

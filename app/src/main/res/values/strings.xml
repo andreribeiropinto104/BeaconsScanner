@@ -16,45 +16,58 @@
     <string name="major">Major</string>
     <string name="minor">Minor</string>
     <string name="beacon_unique_id">Beacon Id</string>
-    <string name="profile">Profile</string>
     <string name="rssi">Rssi</string>
     <string name="power">Tx Power</string>
-    <string name="proximity">Proximity</string>
+    <string name="proximity">Proximity:</string>
 
 
     <!-- EDDYSTONE -->
-    <string name="namespace">Namespace: %1$s</string>
-    <string name="instance">Instance: %1$s</string>
-    <string name="url">Url: %1$s</string>
-    <string name="tx_power_level">Power: %1$d dBm</string>
-    <string name="temperature">Temperature: %1$f \u00b0C</string>
-    <string name="battery_voltage">Battery: %1$d mV</string>
-    <string name="pdu_count">Pdu count: %1$d</string>
-    <string name="time_since_power_up">Time since power up: %1$d seconds</string>
-    <string name="telemetry_version">Telemetry version: %1$d</string>
-    <string name="title_activity_eddystone_details">EddystoneDetailsActivity</string>
-    <string name="title_activity_ibeacon_details">IBeaconDetailsActivity</string>
+    <string name="namespace">Namespace</string>
+    <string name="instance">Instance</string>
+    <string name="url">Url:</string>
+    <string name="tx_power_level">Power: </string>
+    <string name="battery_voltage">Battery</string>
 
-    <string name="save_log_file">Save Logs to File</string>
+    <string name="save_log_file">Save logs to file</string>
+    <string name="stop_save_log_file">Stop saving logs to file</string>
 
-    <string name="text_about_us">Hi there, we are computer engineering master\'s students working on our master thesis. It studies BLE and its potential. We developed this app to detect BLE beacons and based on rssi value that they transmit we can calculated the distance from our device to the beacon.
-We use some techiniques to smooth the signal and therefore get a more accurate distance.
+    <string name="text_about_us">Hi there, we are computer engineering master\'s students working on our master thesis. It studies BLE and its potential.
+        \n\nWe developed this app to detect BLE beacons and based on the RSSI value that they transmit we can calculate the distance from our device to the beacon.
+        We use some techniques to smooth the signal and therefore get a more accurate distance.
         The idea of this app is to share our work and try to get some feedback from you so that we can improve our algorithms.
-
-Thank you for installing our app.</string>
+        \n\nYou can contact us through the email announced in the main menu or using the option \'Contact Us\'.
+        \n\n\n<i>Thank you for installing our app.</i></string>
     <string name="text_content_main">Press the button to start scanning</string>
+    <string name="immediate">Immediate</string>
+    <string name="near">Near</string>
+    <string name="far">Far</string>
+    <string name="calibrating">calibrating</string>
+    <string name="noSignal">no signal</string>
 
     <!-- Menu -->
     <string name="scan_beacons">Scan Beacons</string>
     <string name="communicate">Communicate</string>
     <string name="shareapp">Share App</string>
-    <string name="sendmail">Send Email</string>
+    <string name="sendmail">Contact Us</string>
     <string name="aboutus">About Us</string>
     <string name="reportdata">Report Data</string>
 
     <!-- Alert -->
     <string name="fileSelectCsv">Please select .csv file from Beacons Scanner folder</string>
+    <string name="fileSavedEddystone">Log file saved to folder Beacons Scanner/Eddystone/</string>
+    <string name="fileSavedIbeacon">Log file saved to folder Beacons Scanner/IBeacon/</string>
     <string name="folderEmpty">Log folder is empty. First create log files</string>
+
+    <!-- Permissions -->
+    <string name="needsBluetoothPermissions">This app needs location access</string>
+    <string name="bluetoothPermissions">Please grant location access so this app can detect beacons.</string>
+    <string name="noBluetoothPermissions">Since location access has not been granted, this app will not be able to discover beacons when in the background.</string>
+    <string name="limitedPermissions">Functionality limited</string>
+    <string name="needsStoragePermissions">This app needs storage access</string>
+    <string name="storagePermissions">Please grant storage access so this app can create log files about the beacons.</string>
+    <string name="noStoragePermissions">Since storage access has not been granted, this app will not be able to create log files with information about the received RSSI and distance from the beacons.</string>
+    <string name="shareAppText">Hey, download this app! </string>
+    <string name="appLink" translatable="false">https://play.google.com/store/apps/details?id=com.kontakt.app</string>
 
 
 </resources>

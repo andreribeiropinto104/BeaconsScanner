@@ -81,8 +81,8 @@ public class MainActivity extends AppCompatActivity
             if (this.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 // Alterar texto
-                builder.setTitle("This app needs location access");
-                builder.setMessage("Please grant location access so this app can detect beacons.");
+                builder.setTitle(R.string.needsStoragePermissions);
+                builder.setMessage(R.string.storagePermissions);
                 builder.setPositiveButton(android.R.string.ok, null);
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @TargetApi(Build.VERSION_CODES.M)
@@ -134,9 +134,9 @@ public class MainActivity extends AppCompatActivity
 
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
+                    builder.setTitle(R.string.limitedPermissions);
                     // Alterar texto
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setMessage(R.string.noStoragePermissions);
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -180,17 +180,18 @@ public class MainActivity extends AppCompatActivity
             Intent shareIntent = new Intent(Intent.ACTION_SEND);
             shareIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             shareIntent.setType("text/plain");
-            shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, "Hey, download this app! https://play.google.com/store/apps/details?id=com.kontakt.app");
+            String shareText = this.getString(R.string.shareAppText) + " " + this.getString(R.string.appLink);
+            shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareText);
             startActivity(shareIntent);
 
         } else if (id == R.id.nav_send) {
 
             Intent sendIntent = new Intent(Intent.ACTION_VIEW);
             sendIntent.setType("plain/text");
-            sendIntent.setData(Uri.parse("northteamsoftware@gmail.com"));
+            sendIntent.setData(Uri.parse("geral@northteamsoftware.com"));
             sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
-            sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"northteamsoftware@gmail.com"});
-            sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Report bug or give tip - App BeaconsScanner");
+            sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"geral@northteamsoftware.com"});
+            sendIntent.putExtra(Intent.EXTRA_SUBJECT, " - App Beacons Scanner");
             startActivity(sendIntent);
 
         } else if (id == R.id.nav_about) {
@@ -207,10 +208,7 @@ public class MainActivity extends AppCompatActivity
 
             showFileChooser();
 
-
-
         }
-
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -291,9 +289,9 @@ public class MainActivity extends AppCompatActivity
                     if (file.getName().substring(file.getName().lastIndexOf(".") + 1).compareTo("csv") == 0) {
                         Intent sendIntent = new Intent(Intent.ACTION_VIEW);
                         sendIntent.setType("plain/text");
-                        sendIntent.setData(Uri.parse("northteamsoftware@gmail.com"));
+                        sendIntent.setData(Uri.parse("suporte@northteamsoftware.com"));
                         sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
-                        sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"northteamsoftware@gmail.com"});
+                        sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"suporte@northteamsoftware.com"});
                         sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Report log");
                         sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
                         startActivity(sendIntent);

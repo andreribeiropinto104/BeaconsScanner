@@ -65,7 +65,7 @@ public class DistanceRangeActivity extends AppCompatActivity implements Proximit
                 eddystone = (IEddystoneDevice) extras.get("EDDYSTONE");
 
 
-                eddystoneScan = new EddystoneDetailsScan(this, eddystone.getInstanceId());
+                eddystoneScan = new EddystoneDetailsScan(this, eddystone.getInstanceId(), eddystone.getNamespaceId());
                 eddystoneScan.startScan(DistanceRangeActivity.this);
             } else {
                 ibeacon = (IBeaconDevice) extras.get("IBEACON");

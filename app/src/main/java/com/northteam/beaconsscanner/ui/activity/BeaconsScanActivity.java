@@ -131,11 +131,9 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
 
                 }
 
-
                 return false;
             }
         });
-
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -143,8 +141,8 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
             // Android M Permission check 
             if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("This app needs location access");
-                builder.setMessage("Please grant location access so this app can detect beacons.");
+                builder.setTitle(R.string.needsBluetoothPermissions);
+                builder.setMessage(R.string.bluetoothPermissions);
                 builder.setPositiveButton(android.R.string.ok, null);
                 builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
                     @TargetApi(Build.VERSION_CODES.M)
@@ -166,8 +164,8 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
                     Log.d(TAG, "coarse location permission granted");
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setTitle(R.string.limitedPermissions);
+                    builder.setMessage(R.string.noBluetoothPermissions);
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -188,9 +186,6 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
      */
     public void startScan() {
 
-        Log.i("BeaconsScanActivity", "startScan()");
-
-
         deviceManager.initializeScan(getOrCreateScanContext(), new OnServiceReadyListener() {
             @Override
             public void onServiceReady() {
@@ -199,7 +194,7 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
 
             @Override
             public void onConnectionFailure() {
-                Log.i("BeaconsScanActivity", "startScan() Erro na conexão");
+                Log.i(TAG, "startScan() Erro na conexão");
             }
         });
 
@@ -264,7 +259,7 @@ public class BeaconsScanActivity extends AppCompatActivity implements ProximityM
 
     @Override
     public void onEvent(BluetoothDeviceEvent bluetoothDeviceEvent) {
-        Log.i("BaeconsScanActivity", "onEvent()");
+        Log.i(TAG, "onEvent()");
         switch (bluetoothDeviceEvent.getEventType()) {
             case DEVICES_UPDATE:
                 onDevicesUpdateEvent(bluetoothDeviceEvent);
