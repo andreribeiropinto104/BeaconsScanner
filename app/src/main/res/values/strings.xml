@@ -51,6 +51,7 @@
     <string name="sendmail">Contact Us</string>
     <string name="aboutus">About Us</string>
     <string name="reportdata">Report Data</string>
+    <string name="tutorial">See Intro</string>
 
     <!-- Alert -->
     <string name="fileSelectCsv">Please select .csv file from Beacons Scanner folder</string>
@@ -68,6 +69,19 @@
     <string name="noStoragePermissions">Since storage access has not been granted, this app will not be able to create log files with information about the received RSSI and distance from the beacons.</string>
     <string name="shareAppText">Hey, download this app! </string>
     <string name="appLink" translatable="false">https://play.google.com/store/apps/details?id=com.northteam.beaconsscanner</string>
+
+    <!-- Tutorial -->
+    <string name="tutorialMain">This tutorial will guide you through the features of this app</string>
+    <string name="tutorialApp">Scan and detect nearby beacons (both Eddystone and iBeacon) and show their details</string>
+    <string name="tutorialLogs">Save logs about the received signals from your beacons</string>
+    <string name="tutorialFolder">A folder with the name of the app was created on the root directory of your device</string>
+    <string name="tutorialSaveFile">Every time you click save log to a file, a .csv file is created in the corresponding folder.
+        \nThe file is named with the timestamp of its creation</string>
+
+    <string name="tutorialScan">Scan</string>
+    <string name="tuturialSaveLogs">Save Logs</string>
+    <string name="tutorialFolderApp">Folder App</string>
+    <string name="tutorialfileCsv">Files CSV</string>
 
 
 </resources>

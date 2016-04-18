@@ -6,6 +6,10 @@
             android:id="@+id/nav_scanBeacons"
             android:icon="@drawable/ic_bluetooth_searching_black_48dp"
             android:title="@string/scan_beacons" />
+        <item
+            android:id="@+id/nav_tutorial"
+            android:icon="@drawable/ic_info_outline_black_48dp"
+            android:title="@string/tutorial" />
 
     </group>
 

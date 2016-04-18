@@ -55,6 +55,8 @@
     <string name="immediate">Muito Perto</string>
     <string name="calibrating">a calibrar</string>
     <string name="noSignal">sem sinal</string>
+    <string name="tutorial">Ver Introdução</string>
+    <string name="tutorialApp">Pesquisa e deteta beacons que estejam no alcance do dispositivo (Eddystone e iBeacon) e mostra os seus detalhes</string>
 
 
 </resources>

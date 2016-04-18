@@ -54,6 +54,8 @@
     <string name="immediate">Immediate</string>
     <string name="calibrating">calibrating</string>
     <string name="noSignal">no signal</string>
+    <string name="tutorial">See Intro</string>
+    <string name="tutorialApp">Scan and detect nearby beacons (both Eddystone and iBeacon) and show their details</string>
 
 
 </resources>
