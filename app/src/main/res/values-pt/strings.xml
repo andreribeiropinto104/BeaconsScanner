@@ -57,6 +57,18 @@
     <string name="noSignal">sem sinal</string>
     <string name="tutorial">Ver Introdução</string>
     <string name="tutorialApp">Pesquisa e deteta beacons que estejam no alcance do dispositivo (Eddystone e iBeacon) e mostra os seus detalhes</string>
+    <string name="tutorialScan">Pesquisa</string>
+    <string name="tutorialMain">Esta introdução irá guiá-lo através das características da aplicação</string>
+    <string name="tutorialFolder">Uma pasta com o nome da aplicação foi criada na raíz do dispositivo</string>
+    <string name="tutorialFolderApp">Pasta da Aplicação</string>
+    <string name="tutorialLogs">Guarda logs acerca dos sinais recebidos dos beacons</string>
+    <string name="tutorialSaveFile">Sempre que clicar em Guardar logs para ficheiro, um ficheiro .csv é criado na pasta correspondente. \nO nome do ficheiro é a marca temporal de quando foi criado</string>
+    <string name="tutorialfileCsv">Ficheiros CSV</string>
+    <string name="tuturialSaveLogs">Guarda Logs</string>
+    <string name="tutorialReportText">No menu existe uma opção que permite reportar dados. Se selecionada, pode reportar os ficheiros de log criados para nós, de forma a que possamos melhorar os nossos algoritmos</string>
+    <string name="comment">Comentar Aplicação</string>
+    <string name="mark_log_file">Clique quando estiver perto do beacon</string>
+    <string name="stop_mark_log_file">Clique quando se afastar do beacon</string>
 
 
 </resources>

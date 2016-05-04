@@ -199,18 +199,28 @@ public class BeaconsScanMonitorAdapter extends BaseExpandableListAdapter {
             Context context = convertView.getContext();
             viewHolder.instance.setText(context.getString(R.string.instance) + ": " + eddystoneDevice.getInstanceId());
             viewHolder.rssi.setText(String.format("Rssi: %.2f", eddystoneDevice.getRssi()));
-            switch (eddystoneDevice.getProximity().toString()) {
+            double dist = eddystoneDevice.getDistance();
+            if (dist > 400) {
+                viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.far)));
+            } else if (dist >= 100 && dist <= 400) {
+                viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.near)));
+            } else {
+                viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.immediate)));
+            }
+            /*switch (eddystoneDevice.getDistance()) {
+                //> 4 metros
                 case "FAR":
-
                     viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.far)));
                     break;
+                //1 < and > 4
                 case "NEAR":
                     viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.near)));
                     break;
+                // < 1
                 case "IMMEDIATE":
                     viewHolder.proximity.setText(String.format(context.getString(R.string.proximity) + " " + context.getString(R.string.immediate)));
                     break;
-            }
+            }*/
 
         }
         return convertView;

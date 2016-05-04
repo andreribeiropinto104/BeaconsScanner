@@ -56,7 +56,6 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.northteam.beaconsscanner.ui.activity.BeaconsScanActivity" />
         </activity>
-        <activity android:name=".ui.activity.DistanceRangeActivity" />
         <!-- This meta-data tag is required to use Google Play Services. -->
         <meta-data
             android:name="com.google.android.gms.version"

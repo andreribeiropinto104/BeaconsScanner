@@ -6,7 +6,6 @@ import android.os.CountDownTimer;
 import android.os.Environment;
 import android.text.Html;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kontakt.sdk.android.ble.configuration.ActivityCheckConfiguration;
@@ -23,7 +22,6 @@ import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
 import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
-import com.northteam.beaconsscanner.ui.activity.DistanceRangeActivity;
 import com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity;
 
 import java.io.BufferedWriter;
@@ -39,6 +37,7 @@ import java.util.List;
 
 /**
  * Beacons Scanner - EddystoneDetailsScan, file created on 08/04/2016
+ *
  * @author beatrizgomes
  * @author andrepinto
  */
@@ -60,6 +59,9 @@ public class EddystoneDetailsScan {
      */
     public String beaconIdentifier;
     public String namespaceIdentifier;
+
+    private final static int numPositions = 5;
+    private ArrayList<Double> rssiAverage = new ArrayList<>();
     /**
      * The Distance.
      */
@@ -73,10 +75,19 @@ public class EddystoneDetailsScan {
      */
     public ArrayList<Double> rssiArray = new ArrayList<>();
     /**
+     *
+     */
+    public ArrayList<Double> rssiMovingAverage = new ArrayList<>();
+    /**
      * The Count.
      */
     int count = 0; // variavel usada no metodo calculateDistance();
+    /**
+     * number of elements for the moving average
+     */
+    private static int numElementsMovingAverage = 5;
     private String fileName = null;
+    private boolean markingLog = false;
     private Context context;
     CountDownTimer timerCount = new CountDownTimer(5000, 1000) {
 
@@ -88,9 +99,6 @@ public class EddystoneDetailsScan {
             if (context == EddystoneDetailsActivity.getContext()) {
                 TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
                 rssiTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;<i>" + context.getString(R.string.noSignal) + "...</i>"));
-            } else if (context == DistanceRangeActivity.getContext()) {
-                TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
-                distanceTextView.setText(Html.fromHtml("<b><i> sem sinal ... </i></b>"));
             }
         }
     };
@@ -201,8 +209,6 @@ public class EddystoneDetailsScan {
         TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_distance);
         TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
 
-        ImageView imageDistance = (ImageView) ((Activity) context).findViewById(R.id.image_distance);
-        TextView distanceRangeTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
 
         double distance;
 
@@ -211,8 +217,8 @@ public class EddystoneDetailsScan {
             timerCount.cancel();
             timerCount.start();
 
+            //distance = calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
             distance = calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
-
 
             if (context == EddystoneDetailsActivity.getContext()) {
 
@@ -229,7 +235,7 @@ public class EddystoneDetailsScan {
                 else {
                     distanceTextView.append(String.format("%.2f cm", distance));
                     receivedRssi = String.format("%.2f", eddystoneDevice.getRssi());
-                    suavizedRssi = String.format("%.2f", rssiSuavization(eddystoneDevice.getRssi()));
+                    suavizedRssi = String.format("%.2f", rssiSuavizationMode(eddystoneDevice.getRssi()));
                 }
 
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
@@ -247,7 +253,10 @@ public class EddystoneDetailsScan {
                         String date = c.get(Calendar.YEAR) + "/" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "/" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + ";" + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND) + ";";
                         buf.append(date);
                         buf.append(receivedRssi + ";");
-                        buf.append(suavizedRssi);
+                        buf.append(suavizedRssi + ";");
+                        buf.append(String.format("%.2f", distance));
+                        if (markingLog)
+                            buf.append(";YES");
                         buf.newLine();
                         buf.close();
                     } catch (IOException e) {
@@ -256,38 +265,11 @@ public class EddystoneDetailsScan {
                     }
                 }
 
-            } else if (context == DistanceRangeActivity.getContext()) {
-
-
-                distanceRangeTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b>&nbsp;&nbsp; "));
-
-                if (distance == -1)
-                    distanceRangeTextView.append(Html.fromHtml("<i>" + context.getString(R.string.calibrating) + "...</i>"));
-                else {
-                    distance = distance / 100;
-
-                    if (distance >= 0 && distance < 2) {
-                        distanceRangeTextView.setText("Distância: 0m - 2m");
-                        imageDistance.setImageResource(R.drawable.i4);
-                    } else if (distance >= 2 && distance < 4) {
-                        distanceRangeTextView.setText("Distância: 2m - 4m");
-                        imageDistance.setImageResource(R.drawable.i3);
-                    } else if (distance >= 4 && distance < 6) {
-                        distanceRangeTextView.setText("Distância: 4m - 6m");
-                        imageDistance.setImageResource(R.drawable.i2);
-                    } else if (distance >= 6 && distance < 9) {
-                        distanceRangeTextView.setText("Distância: 6m - 9m");
-                        imageDistance.setImageResource(R.drawable.i1);
-                    } else if (distance >= 9) {
-                        distanceRangeTextView.setText("Distância: > 9m");
-                        imageDistance.setImageResource(R.drawable.i0);
-                    }
-
-                }
             }
         }
 
     }
+
 
     /**
      * Calculates the suavized distance
@@ -303,7 +285,8 @@ public class EddystoneDetailsScan {
         Log.i(TAG, "calculateDistance(): receivedRssi: " + receivedRssi);
 
 
-        double rssi = rssiSuavization(receivedRssi);
+        //double rssi = rssiSuavizationMode(receivedRssi);
+        double rssi = rssiSuavizationMovingAverage(receivedRssi);
         Log.i(TAG, "calculateDistance(): rssi suavizado: " + rssi);
 
         if (rssi == 0.0) {
@@ -327,13 +310,34 @@ public class EddystoneDetailsScan {
         }
     }
 
+    /** SUAVIZATION WITH MOVING AVERAGE **/
+
+    /**
+     * @param rssi the received rssi
+     * @return
+     */
+    public double rssiSuavizationMovingAverage(double rssi) {
+
+        if (rssiMovingAverage.size() < numElementsMovingAverage) {
+            rssiMovingAverage.add(rssi);
+        } else {
+            rssiMovingAverage.remove(0);
+            rssiMovingAverage.add(rssi);
+        }
+
+        return averageRssi(1);
+    }
+
+
+    /** SUAVIZATION WITH MODE **/
+
     /**
      * Rssi suavization double.
      *
      * @param rssi Parametro obtido do metodo calculateDistance(int txPower, double receivedRssi), que representa o RSSI lido.
      * @return Retorna a media dos RSSI's
      */
-    public double rssiSuavization(double rssi) {
+    public double rssiSuavizationMode(double rssi) {
 
         double variation = 0, modeValue = 0;
 
@@ -346,7 +350,7 @@ public class EddystoneDetailsScan {
             // modeValue fica com a MODA dos valores de rssi obtidos.
             modeValue = mode();
 
-            Log.i("EddystoneDetailsScan", "rssiSuavization(): moda: " + modeValue);
+            Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): moda: " + modeValue);
 
 
             // variation fica com a diferença entre o rssi obtido com a MODA dos Rssi's
@@ -358,10 +362,10 @@ public class EddystoneDetailsScan {
                 rssiMode.remove(0);
                 rssiMode.add(rssi);
             } else {
-                Log.i("EddystoneDetailsScan", "rssiSuavization(): receivedRssi > moda_variation (" + variation + ")");
+                Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): receivedRssi > moda_variation (" + variation + ")");
                 // Se o rssi for descartado incrementamos a variavel count.
                 count++;
-                Log.i("EddystoneDetailsScan", "rssiSuavization(): count++");
+                Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): count++");
             }
 
             // modeValue fica com a nova MODA
@@ -377,7 +381,7 @@ public class EddystoneDetailsScan {
 
                 rssiArray.add(rssi);
             } else
-                Log.i("EddystoneDetailsScan", "rssiSuavization(): receivedRssi > media_variation (" + variation + ")");
+                Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): receivedRssi > media_variation (" + variation + ")");
         }
         /**
          * Se count == 5, significa que 5 rssi seguidos foram descartados.
@@ -386,7 +390,7 @@ public class EddystoneDetailsScan {
          * MODA e Média.
          */
         if (count == 5) {
-            //Log.i("EddystoneDetailsScan", "rssiSuavization(): Count =  5 ");
+            //Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): Count =  5 ");
             for (int i = 0; i < 9; i++) {
                 rssiMode.remove(0);
                 if (rssiArray.size() >= 12)
@@ -394,10 +398,10 @@ public class EddystoneDetailsScan {
             }
         }
 
-        //Log.i("EddystoneDetailsScan", "rssiSuavization(): mode: " + modeValue);
+        //Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): mode: " + modeValue);
 
         // Retorna a média dos Rssi's, valor que irá ser usado para o calculo da distancia.
-        return averageRssi();
+        return averageRssi(0);
     }
 
     /**
@@ -430,17 +434,35 @@ public class EddystoneDetailsScan {
      *
      * @return um double que representa a Média do conjunto de valores presente no ArrayList<Double> rssiArray.
      */
-    public double averageRssi() {
-
-        if (rssiArray.size() == 0)
-            return 0.0;
+    public double averageRssi(int id) {
+        double average = 0.0;
         double sum = 0;
 
-        for (double val : rssiArray) {
-            sum += val;
+        switch (id) {
+            // Method with mode
+            case 0:
+                if (rssiArray.size() == 0)
+                    return 0.0;
+
+                for (double val : rssiArray) {
+                    sum += val;
+                }
+                average = sum / rssiArray.size();
+                break;
+            // Method with moving average
+            case 1:
+                if (rssiMovingAverage.size() == 0)
+                    return 0.0;
+
+                for (double val : rssiMovingAverage) {
+                    sum += val;
+                }
+                average = sum / rssiMovingAverage.size();
+                break;
         }
 
-        return sum / rssiArray.size();
+        return average;
+
     }
 
 
@@ -450,6 +472,14 @@ public class EddystoneDetailsScan {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public boolean isMarkingLog() {
+        return markingLog;
+    }
+
+    public void setMarkingLog(boolean markingLog) {
+        this.markingLog = markingLog;
     }
 }
 

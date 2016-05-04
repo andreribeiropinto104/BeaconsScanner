@@ -8,7 +8,7 @@
             android:title="@string/scan_beacons" />
         <item
             android:id="@+id/nav_tutorial"
-            android:icon="@drawable/ic_info_outline_black_48dp"
+            android:icon="@drawable/ic_help_outline_black_48dp"
             android:title="@string/tutorial" />
 
     </group>
@@ -20,6 +20,10 @@
                 android:icon="@drawable/ic_share_black_48dp"
                 android:title="@string/shareapp" />
             <item
+                android:id="@+id/nav_market"
+                android:icon="@drawable/ic_thumb_up_black_48dp"
+                android:title="@string/comment" />
+            <item
                 android:id="@+id/nav_send"
                 android:icon="@drawable/ic_send_black_48dp"
                 android:title="@string/sendmail" />
@@ -29,7 +33,7 @@
                 android:title="@string/reportdata" />
             <item
                 android:id="@+id/nav_about"
-                android:icon="@drawable/ic_info_black_48dp"
+                android:icon="@drawable/ic_info_outline_black_48dp"
                 android:title="@string/aboutus" />
         </menu>
     </item>

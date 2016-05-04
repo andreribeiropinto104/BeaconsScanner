@@ -31,6 +31,9 @@
     <string name="save_log_file">Save logs to file</string>
     <string name="stop_save_log_file">Stop saving logs to file</string>
 
+    <string name="mark_log_file">Click when near the beacon</string>
+    <string name="stop_mark_log_file">Click when moving away from the beacon</string>
+
     <string name="text_about_us">Hi there, we are computer engineering master\'s students working on our master thesis. It studies BLE and its potential.
         \n\nWe developed this app to detect BLE beacons and based on the RSSI value that they transmit we can calculate the distance from our device to the beacon.
         We use some techniques to smooth the signal and therefore get a more accurate distance.
@@ -48,6 +51,7 @@
     <string name="scan_beacons">Scan Beacons</string>
     <string name="communicate">Communicate</string>
     <string name="shareapp">Share App</string>
+    <string name="comment">Comment App</string>
     <string name="sendmail">Contact Us</string>
     <string name="aboutus">About Us</string>
     <string name="reportdata">Report Data</string>
@@ -71,17 +75,17 @@
     <string name="appLink" translatable="false">https://play.google.com/store/apps/details?id=com.northteam.beaconsscanner</string>
 
     <!-- Tutorial -->
-    <string name="tutorialMain">This tutorial will guide you through the features of this app</string>
+    <string name="tutorialMain">This intro will guide you through the features of this app</string>
     <string name="tutorialApp">Scan and detect nearby beacons (both Eddystone and iBeacon) and show their details</string>
     <string name="tutorialLogs">Save logs about the received signals from your beacons</string>
     <string name="tutorialFolder">A folder with the name of the app was created on the root directory of your device</string>
-    <string name="tutorialSaveFile">Every time you click save log to a file, a .csv file is created in the corresponding folder.
+    <string name="tutorialSaveFile">Every time you click Save log to a file, a .csv file is created in the corresponding folder.
         \nThe file is named with the timestamp of its creation</string>
-
     <string name="tutorialScan">Scan</string>
     <string name="tuturialSaveLogs">Save Logs</string>
-    <string name="tutorialFolderApp">Folder App</string>
-    <string name="tutorialfileCsv">Files CSV</string>
+    <string name="tutorialFolderApp">App Folder</string>
+    <string name="tutorialfileCsv">CSV Files</string>
+    <string name="tutorialReportText">On the menu there\'s an option to report data. If selected you can report the log files that you created to us, so that we can work to improve our algorithms</string>
 
 
 </resources>

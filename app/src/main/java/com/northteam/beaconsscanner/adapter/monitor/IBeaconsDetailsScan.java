@@ -3,9 +3,9 @@ package com.northteam.beaconsscanner.adapter.monitor;
 import android.app.Activity;
 import android.content.Context;
 import android.os.CountDownTimer;
+import android.os.Environment;
 import android.text.Html;
 import android.util.Log;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.kontakt.sdk.android.ble.configuration.ActivityCheckConfiguration;
@@ -22,11 +22,15 @@ import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
 import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.northteam.beaconsscanner.R;
-import com.northteam.beaconsscanner.ui.activity.DistanceRangeActivity;
 import com.northteam.beaconsscanner.ui.activity.IBeaconDetailsActivity;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -73,6 +77,8 @@ public class IBeaconsDetailsScan {
 
     private String fileName = null;
 
+    private boolean markingLog = false;
+
     /**
      * timerCount to check if connection with beacon was lost
      */
@@ -87,9 +93,6 @@ public class IBeaconsDetailsScan {
             if (context == IBeaconDetailsActivity.getContext()) {
                 TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.rssi);
                 rssiTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;<i>" + context.getString(R.string.noSignal) + "</i>"));
-            } else {
-                TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
-                distanceTextView.setText(Html.fromHtml("<b><i> sem sinal ... </i></b>"));
             }
         }
     };
@@ -195,8 +198,6 @@ public class IBeaconsDetailsScan {
         List<IBeaconDevice> iBeaconDevices = event.getDeviceList();
         TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.distance);
         TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.rssi);
-        ImageView imageDistance = (ImageView) ((Activity) context).findViewById(R.id.image_distance);
-        TextView distanceRangeTextView = (TextView) ((Activity) context).findViewById(R.id.distance_range);
 
         double distance;
 
@@ -224,37 +225,33 @@ public class IBeaconsDetailsScan {
                     suavizedRssi = String.format("%.2f", rssiSuavization(iBeaconDevice.getRssi()));
                 }
 
-                rssiTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;"));
+                rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
                 rssiTextView.append(String.format("%.2f dBm", iBeaconDevice.getRssi()));
 
-            } else if (context == DistanceRangeActivity.getContext()) {
+                if (fileName != null && distance != -1) {
+                    File dir = Environment.getExternalStorageDirectory();
 
-                distanceRangeTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b> &nbsp;&nbsp;"));
+                    File logFile = new File(dir + "/Beacons Scanner/" + folderName + "/" + fileName);
 
-                if (distance == -1)
-                    distanceRangeTextView.append(Html.fromHtml("<i>" + context.getString(R.string.calibrating) + " ...</i>"));
-                else {
-                    //distanceRangeTextView.append(String.format("%.2f m",distance));
-
-                    if (distance >= 0 && distance < 1) {
-                        distanceRangeTextView.setText("Distância: 0m - 1m");
-                        imageDistance.setImageResource(R.drawable.i4);
-                    } else if (distance >= 1 && distance < 3) {
-                        distanceRangeTextView.setText("Distância: 1m - 3m");
-                        imageDistance.setImageResource(R.drawable.i3);
-                    } else if (distance >= 3 && distance < 7) {
-                        distanceRangeTextView.setText("Distância: 3m - 7m");
-                        imageDistance.setImageResource(R.drawable.i2);
-                    } else if (distance >= 7 && distance < 12) {
-                        distanceRangeTextView.setText("Distância: 7m - 12m");
-                        imageDistance.setImageResource(R.drawable.i1);
-                    } else if (distance >= 12) {
-                        distanceRangeTextView.setText("Distância: > 12m");
-                        imageDistance.setImageResource(R.drawable.i0);
+                    try {
+                        //BufferedWriter for performance, true to set append to file flag
+                        BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+                        Calendar c = Calendar.getInstance();
+                        String date = c.get(Calendar.YEAR) + "/" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "/" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + ";" + c.get(Calendar.HOUR_OF_DAY) + ":" + c.get(Calendar.MINUTE) + ":" + c.get(Calendar.SECOND) + ";";
+                        buf.append(date);
+                        buf.append(receivedRssi + ";");
+                        buf.append(suavizedRssi + ";");
+                        buf.append(String.format("%.2f", distance));
+                        if (isMarkingLog())
+                            buf.append(";*");
+                        buf.newLine();
+                        buf.close();
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
                     }
-
-
                 }
+
             }
 
         }
@@ -352,7 +349,7 @@ public class IBeaconsDetailsScan {
          * MODA e Média.
          */
         if (count == 5) {
-            Log.i(TAG, "rssiSuavization(): Count =  5 ");
+            Log.i(TAG, "rssiSuavizationMode(): Count =  5 ");
             for (int i = 0; i < 9; i++) {
                 rssiMode.remove(0);
                 if (rssiArray.size() >= 12)
@@ -360,7 +357,7 @@ public class IBeaconsDetailsScan {
             }
         }
 
-        Log.i(TAG, "rssiSuavization(): mode: " + modeValue);
+        Log.i(TAG, "rssiSuavizationMode(): mode: " + modeValue);
 
         // Retorna a média dos Rssi's, valor que irá ser usado para o calculo da distancia.
         return averageRssi();
@@ -416,6 +413,14 @@ public class IBeaconsDetailsScan {
 
     public void setFileName(String fileName) {
         this.fileName = fileName;
+    }
+
+    public boolean isMarkingLog() {
+        return markingLog;
+    }
+
+    public void setMarkingLog(boolean markingLog) {
+        this.markingLog = markingLog;
     }
 }
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -130,7 +131,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
             namespaceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.namespace) + ":</b> &nbsp;&nbsp;" + eddystone.getNamespaceId()));
             instaceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.instance) + ":</b> &nbsp;&nbsp;" + eddystone.getInstanceId()));
-            rssiTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.rssi) + "</b> &nbsp;&nbsp;"));
+            rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
             rssiTextView.append(String.format("%.2f dBm", eddystone.getRssi()));
             txPowerTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.power) + ":</b> " + "&nbsp;&nbsp;" + eddystone.getTxPower()));
             batteryTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.battery_voltage) + ":</b> &nbsp;&nbsp;" + eddystone.getBatteryVoltage() + " V"));
@@ -145,6 +146,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
         }
 
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
 
@@ -255,6 +257,23 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (eddystoneScan.getFileName() != null) {
+            LayoutInflater inflater = getLayoutInflater();
+            // Inflate the Layout
+            View layout = inflater.inflate(R.layout.custom_toast,
+                    (ViewGroup) findViewById(R.id.custom_toast_layout));
+            ImageView imgCSV = (ImageView) layout.findViewById(R.id.imgToast);
+            imgCSV.setImageResource(R.drawable.ic_insert_drive_file_black_48dp);
+            TextView textToast = (TextView) layout.findViewById(R.id.textToShow);
+            // Set the Text to show in TextView
+            textToast.setText(R.string.fileSavedEddystone);
+            Toast toast = new Toast(getApplicationContext());
+            toast.setGravity(Gravity.BOTTOM, 0, 400);
+            toast.setDuration(Toast.LENGTH_LONG);
+            toast.setView(layout);
+            toast.show();
+
+        }
         eddystoneScan.deviceManager.disconnect();
         eddystoneScan.deviceManager = null;
         ButterKnife.unbind(this);
@@ -265,6 +284,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     public void startSaving() {
         // TODO ...
         Log.i(TAG, "onClick()");
+
         String folderName = "Eddystone";
 
         Calendar c = Calendar.getInstance();
@@ -296,8 +316,18 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
         try {
             //BufferedWriter for performance, true to set append to file flag
-            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append("Date; Time; Received RSSI; Suavized RSSI");
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, false));
+            buf.append("Device Model;");
+            buf.append(Build.MODEL + ";");
+            buf.append("Android Version;");
+            buf.append(Build.VERSION.RELEASE);
+            buf.newLine();
+            buf.append("Beacon Profile;");
+            buf.append(folderName);
+            buf.newLine();
+            buf.append("Tx Power;");
+            buf.append("" + eddystone.getTxPower());
+            buf.append("Date; Time; Received RSSI; Suavized RSSI; Distance; Near");
             buf.newLine();
             buf.close();
         } catch (IOException e) {
@@ -307,6 +337,11 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
         ImageButton imgBtnSaveLog = (ImageButton) findViewById(R.id.imageButton_save_log);
         ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log);
+
+        ImageButton imgBtnMarkLog = (ImageButton) findViewById(R.id.imageButtonMarkLog);
+        TextView txtMark = (TextView) findViewById(R.id.textView_mark_log);
+
+
         TextView txtSave = (TextView) findViewById(R.id.textView_save_log);
 
         if (imgBtnSaveLog.getVisibility() == View.VISIBLE) {
@@ -314,6 +349,11 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             txtSave.setText(R.string.stop_save_log_file);
 
             imgBtnStopSaveLog.setVisibility(View.VISIBLE);
+
+            imgBtnMarkLog.setVisibility(View.VISIBLE);
+            txtMark.setVisibility(View.VISIBLE);
+            txtMark.setText(R.string.mark_log_file);
+
 
             eddystoneScan.setFileName(fileName);
 
@@ -329,10 +369,22 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
         ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log);
         TextView txtSave = (TextView) findViewById(R.id.textView_save_log);
 
+        ImageButton imgBtnMarkLog = (ImageButton) findViewById(R.id.imageButtonMarkLog);
+        ImageButton imgBtnStopMarkLog = (ImageButton) findViewById(R.id.imageButtonStopMarkLog);
+
+        TextView txtMark = (TextView) findViewById(R.id.textView_mark_log);
+
+
         if (imgBtnStopSaveLog.getVisibility() == View.VISIBLE) {
             imgBtnSaveLog.setVisibility(View.VISIBLE);
 
             imgBtnStopSaveLog.setVisibility(View.INVISIBLE);
+
+            imgBtnMarkLog.setVisibility(View.INVISIBLE);
+            imgBtnStopMarkLog.setVisibility(View.INVISIBLE);
+            txtMark.setVisibility(View.INVISIBLE);
+
+            eddystoneScan.setMarkingLog(false);
 
             eddystoneScan.setFileName(null);
 
@@ -354,5 +406,45 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
         }
     }
+
+    @OnClick(R.id.imageButtonMarkLog)
+    public void markLog() {
+        ImageButton imgBtnMarkLog = (ImageButton) findViewById(R.id.imageButtonMarkLog);
+
+        ImageButton imgBtnStopMarkLog = (ImageButton) findViewById(R.id.imageButtonStopMarkLog);
+        TextView txtMark = (TextView) findViewById(R.id.textView_mark_log);
+
+        if (imgBtnMarkLog.getVisibility() == View.VISIBLE) {
+            imgBtnMarkLog.setVisibility(View.INVISIBLE);
+            txtMark.setText(R.string.stop_mark_log_file);
+
+            imgBtnStopMarkLog.setVisibility(View.VISIBLE);
+
+            eddystoneScan.setMarkingLog(true);
+
+        }
+
+
+    }
+
+    @OnClick(R.id.imageButtonStopMarkLog)
+    public void stopMarkLog() {
+        ImageButton imgBtnMarkLog = (ImageButton) findViewById(R.id.imageButtonMarkLog);
+        ImageButton imgBtnStopMarkLog = (ImageButton) findViewById(R.id.imageButtonStopMarkLog);
+        TextView txtMark = (TextView) findViewById(R.id.textView_mark_log);
+
+        if (imgBtnStopMarkLog.getVisibility() == View.VISIBLE) {
+            imgBtnStopMarkLog.setVisibility(View.INVISIBLE);
+            txtMark.setText(R.string.mark_log_file);
+
+            imgBtnMarkLog.setVisibility(View.VISIBLE);
+
+            eddystoneScan.setMarkingLog(false);
+
+        }
+
+
+    }
+
 
 }

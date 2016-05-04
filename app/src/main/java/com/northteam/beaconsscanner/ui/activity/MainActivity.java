@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
-
         File directory = new File(Environment.getExternalStorageDirectory(), "Beacons Scanner");
         System.out.println(directory.getAbsolutePath());
         if (!directory.exists()) {
@@ -230,15 +229,27 @@ public class MainActivity extends AppCompatActivity
             shareIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareText);
             startActivity(shareIntent);
 
+        } else if (id == R.id.nav_market) {
+
+            final String appPackageName = getPackageName(); // getPackageName() from Context or Activity object
+            try {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + appPackageName)));
+            } catch (android.content.ActivityNotFoundException anfe) {
+                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=" + appPackageName)));
+            }
+
         } else if (id == R.id.nav_send) {
 
-            Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+            //Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+            Intent sendIntent = new Intent(Intent.ACTION_SEND);
             sendIntent.setType("plain/text");
-            sendIntent.setData(Uri.parse("geral@northteamsoftware.com"));
-            sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
+            //sendIntent.setData(Uri.parse("geral@northteamsoftware.com"));
+            //sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
             sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"geral@northteamsoftware.com"});
             sendIntent.putExtra(Intent.EXTRA_SUBJECT, " - App Beacons Scanner");
-            startActivity(sendIntent);
+            //startActivity(sendIntent);
+            startActivity(Intent.createChooser(sendIntent, "Send Email"));
+
 
         } else if (id == R.id.nav_about) {
 
@@ -333,14 +344,14 @@ public class MainActivity extends AppCompatActivity
                     // Initiate the upload
 
                     if (file.getName().substring(file.getName().lastIndexOf(".") + 1).compareTo("csv") == 0) {
-                        Intent sendIntent = new Intent(Intent.ACTION_VIEW);
+                        Intent sendIntent = new Intent(Intent.ACTION_SEND);
                         sendIntent.setType("plain/text");
-                        sendIntent.setData(Uri.parse("suporte@northteamsoftware.com"));
-                        sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
+                        //sendIntent.setData(Uri.parse("suporte@northteamsoftware.com"));
+                        //sendIntent.setClassName("com.google.android.gm", "com.google.android.gm.ComposeActivityGmail");
                         sendIntent.putExtra(Intent.EXTRA_EMAIL, new String[]{"suporte@northteamsoftware.com"});
                         sendIntent.putExtra(Intent.EXTRA_SUBJECT, "Report log");
                         sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(file));
-                        startActivity(sendIntent);
+                        startActivity(Intent.createChooser(sendIntent, "Send Email"));
                     } else {
                         LayoutInflater inflater = getLayoutInflater();
                         // Inflate the Layout

@@ -15,11 +15,12 @@ public class TutorialActivity extends AppIntro2 {
 
         // Add your slide's fragments here
         // AppIntro will automatically generate the dots indicator and buttons.
-        addSlide(AppIntroFragment.newInstance("Beacons Scanner", this.getString(R.string.tutorialMain), R.drawable.ic_help_outline_white_48dp, Color.parseColor("#00b8ff")));
-        addSlide(AppIntroFragment.newInstance(this.getString(R.string.tutorialScan), this.getString(R.string.tutorialApp), R.drawable.ic_bluetooth_searching_white_48dp, Color.parseColor("#0088cc")));
-        addSlide(AppIntroFragment.newInstance(this.getString(R.string.tuturialSaveLogs), this.getString(R.string.tutorialLogs), R.drawable.ic_insert_drive_file_white_48dp, Color.parseColor("#00b8ff")));
-        addSlide(AppIntroFragment.newInstance(this.getString(R.string.tutorialFolderApp), this.getString(R.string.tutorialFolder), R.drawable.ic_folder_open_white_48dp, Color.parseColor("#0088cc")));
-        addSlide(AppIntroFragment.newInstance(this.getString(R.string.tutorialfileCsv), this.getString(R.string.tutorialSaveFile), R.drawable.csv_icon_white, Color.parseColor("#00b8ff")));
+        addSlide(AppIntroFragment.newInstance("Beacons Scanner", this.getString(R.string.tutorialMain), R.drawable.ic_help_outline_white_48dp, Color.parseColor("#0088cc")));
+        addSlide(AppIntroFragment.newInstance(this.getString(R.string.tutorialScan), this.getString(R.string.tutorialApp), R.drawable.ic_bluetooth_searching_white_48dp, Color.parseColor("#00b8ff")));
+        addSlide(AppIntroFragment.newInstance(this.getString(R.string.tuturialSaveLogs), this.getString(R.string.tutorialLogs), R.drawable.ic_insert_drive_file_white_48dp, Color.parseColor("#0088cc")));
+        addSlide(AppIntroFragment.newInstance(this.getString(R.string.tutorialFolderApp), this.getString(R.string.tutorialFolder), R.drawable.ic_folder_open_white_48dp, Color.parseColor("#00b8ff")));
+        addSlide(AppIntroFragment.newInstance(this.getString(R.string.tutorialfileCsv), this.getString(R.string.tutorialSaveFile), R.drawable.csv_icon_white, Color.parseColor("#0088cc")));
+        addSlide(AppIntroFragment.newInstance(this.getString(R.string.reportdata), this.getString(R.string.tutorialReportText), R.drawable.ic_report_white_48dp, Color.parseColor("#00b8ff")));
 
         // OPTIONAL METHODS
 

@@ -201,6 +201,52 @@
                     android:textStyle="italic" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <RelativeLayout
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content">
+
+                    <ImageButton
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_horizontal"
+                        android:adjustViewBounds="true"
+                        android:background="@android:color/transparent"
+                        android:paddingLeft="15dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_location_on_black_48dp"
+                        android:id="@+id/imageButtonMarkLog_ibeacon"
+                        android:visibility="invisible" />
+
+                    <ImageButton
+                        android:layout_width="60dp"
+                        android:layout_height="60dp"
+                        android:layout_gravity="center_horizontal"
+                        android:adjustViewBounds="true"
+                        android:background="@android:color/transparent"
+                        android:paddingLeft="15dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_location_off_black_48dp"
+                        android:id="@+id/imageButtonStopMarkLog_ibeacon"
+                        android:visibility="invisible" />
+                </RelativeLayout>
+
+                <TextView
+                    android:id="@+id/textView_mark_log_ibeacon"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:paddingLeft="10dp"
+                    android:text="@string/save_log_file"
+                    android:textAppearance="?android:attr/textAppearanceSmall"
+                    android:textStyle="italic"
+                    android:visibility="invisible" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
@@ -94,7 +95,7 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
             distanceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.distance) + ":</b> &nbsp;&nbsp; <i>" + this.getString(R.string.calibrating) + "...</i>"));
             majorTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.major) + ":</b> &nbsp;&nbsp;" + ibeacon.getMajor()));
             minorTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.minor) + ":</b> &nbsp;&nbsp;" + ibeacon.getMinor()));
-            rssiTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;" + ibeacon.getRssi() + " dBm"));
+            rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;" + ibeacon.getRssi() + " dBm"));
             txPowerTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.power) + ":</b> &nbsp;&nbsp;" + ibeacon.getTxPower()));
             batteryTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.battery) + ":</b> &nbsp;&nbsp;" + ibeacon.getBatteryPower() + "%"));
             beaconScan = new IBeaconsDetailsScan(context, ibeacon.getUniqueId());
@@ -103,7 +104,8 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
 
         }
 
-        Log.i(TAG, "OnCreate(): ");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
 
     }
 
@@ -211,6 +213,23 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        if (beaconScan.getFileName() != null) {
+            LayoutInflater inflater = getLayoutInflater();
+            // Inflate the Layout
+            View layout = inflater.inflate(R.layout.custom_toast,
+                    (ViewGroup) findViewById(R.id.custom_toast_layout));
+            ImageView imgCSV = (ImageView) layout.findViewById(R.id.imgToast);
+            imgCSV.setImageResource(R.drawable.ic_insert_drive_file_black_48dp);
+            TextView text = (TextView) layout.findViewById(R.id.textToShow);
+            // Set the Text to show in TextView
+            text.setText(R.string.fileSavedIbeacon);
+
+            Toast toast = new Toast(getApplicationContext());
+            toast.setGravity(Gravity.BOTTOM, 0, 400);
+            toast.setDuration(Toast.LENGTH_LONG);
+            toast.setView(layout);
+            toast.show();
+        }
         beaconScan.deviceManager.disconnect();
         beaconScan.deviceManager = null;
         ButterKnife.unbind(this);
@@ -251,8 +270,16 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
 
         try {
             //BufferedWriter for performance, true to set append to file flag
-            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
-            buf.append("Date; Time; Received RSSI; Suavized RSSI");
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, false));
+            buf.append("Device Model;");
+            buf.append(Build.MODEL + ";");
+            buf.append("Android Version;");
+            buf.append(Build.VERSION.RELEASE);
+            buf.newLine();
+            buf.append("Beacon Profile;");
+            buf.append(folderName);
+            buf.newLine();
+            buf.append("Date; Time; Received RSSI; Suavized RSSI;Distance");
             buf.newLine();
             buf.close();
         } catch (IOException e) {
@@ -264,12 +291,21 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
         ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log_ibeacon);
         TextView txtSave = (TextView) findViewById(R.id.textView_save_log_ibeacon);
 
+        ImageButton imgBtnMarkLog = (ImageButton) findViewById(R.id.imageButtonMarkLog_ibeacon);
+        TextView txtMark = (TextView) findViewById(R.id.textView_mark_log_ibeacon);
+
 
         if (imgBtnSaveLog.getVisibility() == View.VISIBLE) {
             imgBtnSaveLog.setVisibility(View.INVISIBLE);
             txtSave.setText(R.string.stop_save_log_file);
 
             imgBtnStopSaveLog.setVisibility(View.VISIBLE);
+
+            imgBtnMarkLog.setVisibility(View.VISIBLE);
+            txtMark.setVisibility(View.VISIBLE);
+
+            txtMark.setText(R.string.mark_log_file);
+
 
             beaconScan.setFileName(fileName);
 
@@ -283,6 +319,13 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
 
         ImageButton imgBtnSaveLog = (ImageButton) findViewById(R.id.imageButton_save_log_ibeacon);
         ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log_ibeacon);
+        TextView txtSave = (TextView) findViewById(R.id.textView_save_log_ibeacon);
+
+        ImageButton imgBtnMarkLog = (ImageButton) findViewById(R.id.imageButtonMarkLog_ibeacon);
+        ImageButton imgBtnStopMarkLog = (ImageButton) findViewById(R.id.imageButtonStopMarkLog_ibeacon);
+        TextView txtMark = (TextView) findViewById(R.id.textView_mark_log_ibeacon);
+
+
 
         if (imgBtnStopSaveLog.getVisibility() == View.VISIBLE) {
             imgBtnSaveLog.setVisibility(View.VISIBLE);
@@ -300,6 +343,11 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
             TextView text = (TextView) layout.findViewById(R.id.textToShow);
             // Set the Text to show in TextView
             text.setText(R.string.fileSavedIbeacon);
+            txtSave.setText(R.string.save_log_file);
+
+            txtMark.setVisibility(View.INVISIBLE);
+            imgBtnMarkLog.setVisibility(View.INVISIBLE);
+            imgBtnStopMarkLog.setVisibility(View.INVISIBLE);
 
             Toast toast = new Toast(getApplicationContext());
             toast.setGravity(Gravity.BOTTOM, 0, 400);
@@ -307,5 +355,44 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
             toast.setView(layout);
             toast.show();
         }
+    }
+
+    @OnClick(R.id.imageButtonMarkLog_ibeacon)
+    public void markLog() {
+        ImageButton imgBtnMarkLog = (ImageButton) findViewById(R.id.imageButtonMarkLog_ibeacon);
+
+        ImageButton imgBtnStopMarkLog = (ImageButton) findViewById(R.id.imageButtonStopMarkLog_ibeacon);
+        TextView txtMark = (TextView) findViewById(R.id.textView_mark_log_ibeacon);
+
+        if (imgBtnMarkLog.getVisibility() == View.VISIBLE) {
+            imgBtnMarkLog.setVisibility(View.INVISIBLE);
+            txtMark.setText(R.string.stop_mark_log_file);
+
+            imgBtnStopMarkLog.setVisibility(View.VISIBLE);
+
+            beaconScan.setMarkingLog(true);
+
+        }
+
+
+    }
+
+    @OnClick(R.id.imageButtonStopMarkLog_ibeacon)
+    public void stopMarkLog() {
+        ImageButton imgBtnMarkLog = (ImageButton) findViewById(R.id.imageButtonMarkLog_ibeacon);
+        ImageButton imgBtnStopMarkLog = (ImageButton) findViewById(R.id.imageButtonStopMarkLog_ibeacon);
+        TextView txtMark = (TextView) findViewById(R.id.textView_mark_log_ibeacon);
+
+        if (imgBtnStopMarkLog.getVisibility() == View.VISIBLE) {
+            imgBtnStopMarkLog.setVisibility(View.INVISIBLE);
+            txtMark.setText(R.string.mark_log_file);
+
+            imgBtnMarkLog.setVisibility(View.VISIBLE);
+
+            beaconScan.setMarkingLog(false);
+
+        }
+
+
     }
 }
