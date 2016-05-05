@@ -77,7 +77,7 @@ public class EddystoneDetailsScan {
     /**
      * number of elements for the moving average
      */
-    private static int numElementsMovingAverage = 5;
+    private static int numElementsMovingAverage = 3;
     /**
      *
      */
@@ -87,6 +87,7 @@ public class EddystoneDetailsScan {
     double startTime = 0;
     double timeBetweenTwoBeacons = 0;
     double movingAverageRssi = 0.0;
+    private static int mps = 2;
     /**
      * The Count.
      */
@@ -242,7 +243,7 @@ public class EddystoneDetailsScan {
                     distanceTextView.append(String.format("%.2f cm", distance));
                     receivedRssi = String.format("%.2f", eddystoneDevice.getRssi());
                     //suavizedRssi = String.format("%.2f", rssiSuavizationMode(eddystoneDevice.getRssi()));
-                    suavizedRssi = String.format("%.2f", rssiSuavizationMovingAverage(eddystoneDevice.getRssi(), eddystoneDevice.getTxPower()));
+                    suavizedRssi = String.format("%.2f", movingAverageRssi);
                 }
 
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
@@ -354,28 +355,31 @@ public class EddystoneDetailsScan {
     public double rssiSuavizationMovingAverage(double rssi, int txPower) {
 
         Calendar c = Calendar.getInstance();
-        double currentTime = 0.0;
+        //auxMovingAverage - if firt time
         if (auxMovingAverage == 0) {
             startTime = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND);
             auxMovingAverage = 1;
         } else {
-
             timeBetweenTwoBeacons = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND) - startTime;
-
-
         }
-
+        // if the time between two events is 0
+        // accept the user moves 0,5m
+        // 0.75 is 3/4s, user moves two meters per second so we accept a moves 1,50cm.
         if (timeBetweenTwoBeacons < 1)
-            timeBetweenTwoBeacons = 0.15;
-        // 2 metros por sec.
-        double distMax = (timeBetweenTwoBeacons * 2) * 100;
+            timeBetweenTwoBeacons = 0.75;
+
+        //distMax it is the maximum distance that the user can walk in a time period
+        double distMax = (timeBetweenTwoBeacons * mps) * 100;
+
         Log.d(TAG, "Time:" + timeBetweenTwoBeacons);
         Log.d(TAG, "distMax: " + distMax);
 
-        double dist = getDistance(rssi, txPower);
-
-        double distInterval = Math.abs(movingAverageRssi - dist);
+        //distance it is a distance calculate whith rssi recived
+        double disttance = getDistance(rssi, txPower);
+        //distInterval - as is the user in theory moved
+        double distInterval = Math.abs(movingAverageRssi - disttance);
         Log.d(TAG, "DistInterval: " + distInterval);
+        //if plausible
         if (distInterval < distMax) {
             if (rssiMovingAverage.size() < numElementsMovingAverage) {
                 rssiMovingAverage.add(rssi);
@@ -383,9 +387,10 @@ public class EddystoneDetailsScan {
                 rssiMovingAverage.remove(0);
                 rssiMovingAverage.add(rssi);
             }
+            //Updates time for the new entry in the arrayList
             startTime = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND);
-
-        }
+        } else
+            Log.d(TAG, "discard");
 
         return averageRssi(1);
     }

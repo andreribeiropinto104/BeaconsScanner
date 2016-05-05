@@ -48,7 +48,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 2;
     private static final int PERMISSION_REQUEST_WRITE_STORAGE = 3;
 
-    private static final String TAG = "EddyStoneDetailsActivity";
+    private static final String TAG = "EddyStoneDetActivity";
 
     /**
      * The constant context.
@@ -282,8 +282,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     //@OnClick({R.id.imageButton_save_log, R.id.textView_save_log})
     @OnClick(R.id.imageButton_save_log)
     public void startSaving() {
-        // TODO ...
-        Log.i(TAG, "onClick()");
+
 
         String folderName = "Eddystone";
 
@@ -327,6 +326,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             buf.newLine();
             buf.append("Tx Power;");
             buf.append("" + eddystone.getTxPower());
+            buf.newLine();
             buf.append("Date; Time; Received RSSI; Suavized RSSI; Distance; Near");
             buf.newLine();
             buf.close();
