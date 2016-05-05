@@ -60,7 +60,6 @@ public class EddystoneDetailsScan {
     public String beaconIdentifier;
     public String namespaceIdentifier;
 
-    private final static int numPositions = 5;
     private ArrayList<Double> rssiAverage = new ArrayList<>();
     /**
      * The Distance.
@@ -74,18 +73,25 @@ public class EddystoneDetailsScan {
      * The Rssi array.
      */
     public ArrayList<Double> rssiArray = new ArrayList<>();
-    /**
-     *
-     */
-    public ArrayList<Double> rssiMovingAverage = new ArrayList<>();
-    /**
-     * The Count.
-     */
-    int count = 0; // variavel usada no metodo calculateDistance();
+
     /**
      * number of elements for the moving average
      */
     private static int numElementsMovingAverage = 5;
+    /**
+     *
+     */
+    public ArrayList<Double> rssiMovingAverage = new ArrayList<>();
+
+    int auxMovingAverage = 0;
+    double startTime = 0;
+    double timeBetweenTwoBeacons = 0;
+    double movingAverageRssi = 0.0;
+    /**
+     * The Count.
+     */
+    int count = 0; // variavel usada no metodo calculateDistance();
+
     private String fileName = null;
     private boolean markingLog = false;
     private Context context;
@@ -235,7 +241,8 @@ public class EddystoneDetailsScan {
                 else {
                     distanceTextView.append(String.format("%.2f cm", distance));
                     receivedRssi = String.format("%.2f", eddystoneDevice.getRssi());
-                    suavizedRssi = String.format("%.2f", rssiSuavizationMode(eddystoneDevice.getRssi()));
+                    //suavizedRssi = String.format("%.2f", rssiSuavizationMode(eddystoneDevice.getRssi()));
+                    suavizedRssi = String.format("%.2f", rssiSuavizationMovingAverage(eddystoneDevice.getRssi(), eddystoneDevice.getTxPower()));
                 }
 
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
@@ -270,6 +277,33 @@ public class EddystoneDetailsScan {
 
     }
 
+    /**
+     * @param rssi
+     * @param txPower
+     * @return
+     */
+    public double getDistance(Double rssi, int txPower) {
+
+        if (rssi == 0.0) {
+
+            return -1.0; // if we cannot determine distance, return -1.
+        } else {
+
+            double ratio = rssi * 1.0 / txPower;
+            if (ratio < 1.0) {
+                return Math.pow(ratio, 10);
+
+
+            } else {
+                double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+
+                return accuracy;
+            }
+        }
+
+
+    }
+
 
     /**
      * Calculates the suavized distance
@@ -286,7 +320,8 @@ public class EddystoneDetailsScan {
 
 
         //double rssi = rssiSuavizationMode(receivedRssi);
-        double rssi = rssiSuavizationMovingAverage(receivedRssi);
+        double rssi = rssiSuavizationMovingAverage(receivedRssi, txPower);
+        movingAverageRssi = rssi;
         Log.i(TAG, "calculateDistance(): rssi suavizado: " + rssi);
 
         if (rssi == 0.0) {
@@ -310,19 +345,46 @@ public class EddystoneDetailsScan {
         }
     }
 
-    /** SUAVIZATION WITH MOVING AVERAGE **/
+/** SUAVIZATION WITH MOVING AVERAGE **/
 
     /**
      * @param rssi the received rssi
      * @return
      */
-    public double rssiSuavizationMovingAverage(double rssi) {
+    public double rssiSuavizationMovingAverage(double rssi, int txPower) {
 
-        if (rssiMovingAverage.size() < numElementsMovingAverage) {
-            rssiMovingAverage.add(rssi);
+        Calendar c = Calendar.getInstance();
+        double currentTime = 0.0;
+        if (auxMovingAverage == 0) {
+            startTime = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND);
+            auxMovingAverage = 1;
         } else {
-            rssiMovingAverage.remove(0);
-            rssiMovingAverage.add(rssi);
+
+            timeBetweenTwoBeacons = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND) - startTime;
+
+
+        }
+
+        if (timeBetweenTwoBeacons < 1)
+            timeBetweenTwoBeacons = 0.15;
+        // 2 metros por sec.
+        double distMax = (timeBetweenTwoBeacons * 2) * 100;
+        Log.d(TAG, "Time:" + timeBetweenTwoBeacons);
+        Log.d(TAG, "distMax: " + distMax);
+
+        double dist = getDistance(rssi, txPower);
+
+        double distInterval = Math.abs(movingAverageRssi - dist);
+        Log.d(TAG, "DistInterval: " + distInterval);
+        if (distInterval < distMax) {
+            if (rssiMovingAverage.size() < numElementsMovingAverage) {
+                rssiMovingAverage.add(rssi);
+            } else {
+                rssiMovingAverage.remove(0);
+                rssiMovingAverage.add(rssi);
+            }
+            startTime = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND);
+
         }
 
         return averageRssi(1);
