@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -86,7 +87,6 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     /**
      * The Eddystone scan.
      */
-
     EddystoneDetailsScan eddystoneScan;
 
     /**
@@ -111,6 +111,9 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_eddystone_details);
+
+        System.out.println(TAG + " onCreate()");
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(R.string.app_name);
 
@@ -148,6 +151,19 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabEddystone);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                System.out.println(TAG);
+                Intent intentRealtimeChartActivity = new Intent(EddystoneDetailsActivity.this, RealtimeLineChartActivity.class);
+                intentRealtimeChartActivity.putExtra("EDDYSTONE", eddystone);
+                startActivity(intentRealtimeChartActivity);
+                //finish();
+
+            }
+        });
 
 
     }
@@ -197,7 +213,6 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
                     builder.setTitle(R.string.limitedPermissions);
-                    // Alterar texto
                     builder.setMessage(R.string.noStoragePermissions);
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
@@ -238,7 +253,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     @Override
     protected void onResume() {
         super.onResume();
-
+        System.out.println(TAG + " onResume()");
         if (!BluetoothUtils.isBluetoothEnabled()) {
             final Intent intent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(intent, REQUEST_CODE_ENABLE_BLUETOOTH);
@@ -250,7 +265,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     @Override
     protected void onPause() {
         super.onPause();
-
+        System.out.println("PAUSE");
         eddystoneScan.deviceManager.finishScan();
     }
 

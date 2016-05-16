@@ -70,6 +70,15 @@
             android:name=".ui.activity.TutorialActivity"
             android:noHistory="true"
             android:theme="@style/AppTheme.NoActionBar" />
-    </application>
 
+        <activity
+            android:name="com.northteam.beaconsscanner.ui.activity.RealtimeLineChartActivity"
+            android:label="@string/title_activity_realtime_line_chart"
+            android:parentActivityName="com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity" />
+        </activity>
+    </application>
 </manifest>

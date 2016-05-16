@@ -45,10 +45,12 @@
     <string name="near">Near</string>
     <string name="far">Far</string>
     <string name="calibrating">calibrating</string>
-    <string name="noSignal">no signal</string>
+    <string name="suavizedRssi">Suavized Rssi</string>
+    <string name="receivedRssi">Received Rssi</string>
 
     <!-- Menu -->
     <string name="scan_beacons">Scan Beacons</string>
+    <string name="noSignal">no signal</string>
     <string name="communicate">Communicate</string>
     <string name="shareapp">Share App</string>
     <string name="comment">Comment App</string>
@@ -86,6 +88,8 @@
     <string name="tutorialFolderApp">App Folder</string>
     <string name="tutorialfileCsv">CSV Files</string>
     <string name="tutorialReportText">On the menu there\'s an option to report data. If selected you can report the log files that you created to us, so that we can work to improve our algorithms</string>
+    <string name="title_activity_test">TestActivity</string>
+    <string name="title_activity_realtime_line_chart">RealtimeLineChartActivity</string>
 
 
 </resources>

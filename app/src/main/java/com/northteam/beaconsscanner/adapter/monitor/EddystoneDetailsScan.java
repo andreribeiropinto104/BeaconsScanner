@@ -8,6 +8,7 @@ import android.text.Html;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
 import com.kontakt.sdk.android.ble.configuration.ActivityCheckConfiguration;
 import com.kontakt.sdk.android.ble.configuration.ForceScanConfiguration;
 import com.kontakt.sdk.android.ble.configuration.scan.EddystoneScanContext;
@@ -23,6 +24,7 @@ import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
 import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity;
+import com.northteam.beaconsscanner.ui.activity.RealtimeLineChartActivity;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -88,10 +90,17 @@ public class EddystoneDetailsScan {
     double timeBetweenTwoBeacons = 0;
     double movingAverageRssi = 0.0;
     private static int mps = 2;
+
+    private RealtimeLineChartActivity chartActivity;
     /**
      * The Count.
      */
     int count = 0; // variavel usada no metodo calculateDistance();
+
+    /* CHART */
+    private LineChart mChart;
+    private FeedChart feedChart;
+
 
     private String fileName = null;
     private boolean markingLog = false;
@@ -137,7 +146,28 @@ public class EddystoneDetailsScan {
         this.beaconIdentifier = identifier;
         this.namespaceIdentifier = namespace;
         this.context = context;
+
         deviceManager = new ProximityManager(context);
+
+    }
+
+    /**
+     *
+     * @param context
+     * @param identifier
+     * @param namespace
+     * @param lc
+     */
+    public EddystoneDetailsScan(Context context, String identifier, String namespace, LineChart lc) {
+
+        this.beaconIdentifier = identifier;
+        this.namespaceIdentifier = namespace;
+        this.context = context;
+        this.mChart = lc;
+        this.feedChart = new FeedChart(lc, context);
+
+        deviceManager = new ProximityManager(context);
+
 
     }
 
@@ -229,7 +259,6 @@ public class EddystoneDetailsScan {
 
             if (context == EddystoneDetailsActivity.getContext()) {
 
-
                 distanceTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b>&nbsp;&nbsp;"));
 
                 String receivedRssi = "";
@@ -273,7 +302,12 @@ public class EddystoneDetailsScan {
                     }
                 }
 
+            } else if (context == RealtimeLineChartActivity.getContext()) {
+                if (distance != -1)
+                    feedChart.addEntry(movingAverageRssi, eddystoneDevice.getRssi());
+
             }
+
         }
 
     }
