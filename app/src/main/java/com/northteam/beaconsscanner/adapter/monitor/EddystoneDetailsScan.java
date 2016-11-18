@@ -24,7 +24,10 @@ import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
 import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity;
+import com.northteam.beaconsscanner.util.Calculate;
 import com.northteam.beaconsscanner.ui.activity.RealtimeLineChartActivity;
+import com.northteam.beaconsscanner.util.LogFile;
+
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -62,46 +65,15 @@ public class EddystoneDetailsScan {
     public String beaconIdentifier;
     public String namespaceIdentifier;
 
-    private ArrayList<Double> rssiAverage = new ArrayList<>();
-    /**
-     * The Distance.
-     */
-    //public double distance;
-    /**
-     * The Rssi mode.
-     */
-    public ArrayList<Double> rssiMode = new ArrayList<>();
-    /**
-     * The Rssi array.
-     */
-    public ArrayList<Double> rssiArray = new ArrayList<>();
 
-    /**
-     * number of elements for the moving average
-     */
-    private static int numElementsMovingAverage = 3;
-    /**
-     *
-     */
-    public ArrayList<Double> rssiMovingAverage = new ArrayList<>();
-
-    int auxMovingAverage = 0;
-    double startTime = 0;
-    double timeBetweenTwoBeacons = 0;
-    double movingAverageRssi = 0.0;
-    private static int mps = 2;
-
-    private RealtimeLineChartActivity chartActivity;
-    /**
-     * The Count.
-     */
-    int count = 0; // variavel usada no metodo calculateDistance();
+    private Calculate calc = new Calculate("EddystoneDetailsScan");
 
     /* CHART */
     private LineChart mChart;
     private FeedChart feedChart;
 
 
+    private LogFile lf = new LogFile("Eddystone");
     private String fileName = null;
     private boolean markingLog = false;
     private Context context;
@@ -125,19 +97,6 @@ public class EddystoneDetailsScan {
     /**
      * Instantiates a new Eddystone details scan.
      *
-     * @param context the context
-     */
-    public EddystoneDetailsScan(Context context) {
-
-        this.context = context;
-        deviceManager = new ProximityManager(context);
-
-    }
-
-
-    /**
-     * Instantiates a new Eddystone details scan.
-     *
      * @param context    the context
      * @param identifier the identifier
      */
@@ -146,13 +105,11 @@ public class EddystoneDetailsScan {
         this.beaconIdentifier = identifier;
         this.namespaceIdentifier = namespace;
         this.context = context;
-
         deviceManager = new ProximityManager(context);
 
     }
 
     /**
-     *
      * @param context
      * @param identifier
      * @param namespace
@@ -246,6 +203,8 @@ public class EddystoneDetailsScan {
         TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_distance);
         TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
 
+        String receivedRssi = "";
+        String suavizedRssi = "";
 
         double distance;
 
@@ -254,15 +213,14 @@ public class EddystoneDetailsScan {
             timerCount.cancel();
             timerCount.start();
 
-            //distance = calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
-            distance = calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
+            distance = calc.calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
 
             if (context == EddystoneDetailsActivity.getContext()) {
 
+
                 distanceTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b>&nbsp;&nbsp;"));
 
-                String receivedRssi = "";
-                String suavizedRssi = "";
+
                 String folderName = "Eddystone";
 
 
@@ -271,14 +229,14 @@ public class EddystoneDetailsScan {
                 else {
                     distanceTextView.append(String.format("%.2f cm", distance));
                     receivedRssi = String.format("%.2f", eddystoneDevice.getRssi());
-                    //suavizedRssi = String.format("%.2f", rssiSuavizationMode(eddystoneDevice.getRssi()));
-                    suavizedRssi = String.format("%.2f", movingAverageRssi);
+                    suavizedRssi = String.format("%.2f", calc.getMovingAverageRssi());
                 }
 
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
                 rssiTextView.append(String.format("%.2f dBm", eddystoneDevice.getRssi()));
 
                 if (fileName != null && distance != -1) {
+                    /*
                     File dir = Environment.getExternalStorageDirectory();
 
                     File logFile = new File(dir + "/Beacons Scanner/" + folderName + "/" + fileName);
@@ -300,272 +258,26 @@ public class EddystoneDetailsScan {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
+                    */
+                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog);
+
                 }
 
             } else if (context == RealtimeLineChartActivity.getContext()) {
-                if (distance != -1)
-                    feedChart.addEntry(movingAverageRssi, eddystoneDevice.getRssi());
-
-            }
-
-        }
-
-    }
-
-    /**
-     * @param rssi
-     * @param txPower
-     * @return
-     */
-    public double getDistance(Double rssi, int txPower) {
-
-        if (rssi == 0.0) {
-
-            return -1.0; // if we cannot determine distance, return -1.
-        } else {
-
-            double ratio = rssi * 1.0 / txPower;
-            if (ratio < 1.0) {
-                return Math.pow(ratio, 10);
-
-
-            } else {
-                double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
-
-                return accuracy;
-            }
-        }
-
-
-    }
-
-
-    /**
-     * Calculates the suavized distance
-     *
-     * @param txPower
-     * @param receivedRssi
-     * @return the calculated distance
-     */
-    public double calculateDistance(int txPower, double receivedRssi) {
-
-
-        Log.i(TAG, "-----------------------");
-        Log.i(TAG, "calculateDistance(): receivedRssi: " + receivedRssi);
-
-
-        //double rssi = rssiSuavizationMode(receivedRssi);
-        double rssi = rssiSuavizationMovingAverage(receivedRssi, txPower);
-        movingAverageRssi = rssi;
-        Log.i(TAG, "calculateDistance(): rssi suavizado: " + rssi);
-
-        if (rssi == 0.0) {
-            //distanceTextView.setText(Html.fromHtml("<b>Distância:</b>&nbsp;&nbsp;a calibrar..."));
-
-            return -1.0; // if we cannot determine distance, return -1.
-        } else {
-
-            double ratio = rssi * 1.0 / txPower;
-            if (ratio < 1.0) {
-                return Math.pow(ratio, 10);
-                //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
-                //distanceTextView.append(String.format("%.2f cm", Math.pow(ratio, 10)));
-
-            } else {
-                double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
-                //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
-                //distanceTextView.append(String.format("%.2f cm", accuracy));
-                return accuracy;
-            }
-        }
-    }
-
-/** SUAVIZATION WITH MOVING AVERAGE **/
-
-    /**
-     * @param rssi the received rssi
-     * @return
-     */
-    public double rssiSuavizationMovingAverage(double rssi, int txPower) {
-
-        Calendar c = Calendar.getInstance();
-        //auxMovingAverage - if firt time
-        if (auxMovingAverage == 0) {
-            startTime = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND);
-            auxMovingAverage = 1;
-        } else {
-            timeBetweenTwoBeacons = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND) - startTime;
-        }
-        // if the time between two events is 0
-        // accept the user moves 0,5m
-        // 0.75 is 3/4s, user moves two meters per second so we accept a moves 1,50cm.
-        if (timeBetweenTwoBeacons < 1)
-            timeBetweenTwoBeacons = 0.75;
-
-        //distMax it is the maximum distance that the user can walk in a time period
-        double distMax = (timeBetweenTwoBeacons * mps) * 100;
-
-        Log.d(TAG, "Time:" + timeBetweenTwoBeacons);
-        Log.d(TAG, "distMax: " + distMax);
-
-        //distance it is a distance calculate whith rssi recived
-        double disttance = getDistance(rssi, txPower);
-        //distInterval - as is the user in theory moved
-        double distInterval = Math.abs(movingAverageRssi - disttance);
-        Log.d(TAG, "DistInterval: " + distInterval);
-        //if plausible
-        if (distInterval < distMax) {
-            if (rssiMovingAverage.size() < numElementsMovingAverage) {
-                rssiMovingAverage.add(rssi);
-            } else {
-                rssiMovingAverage.remove(0);
-                rssiMovingAverage.add(rssi);
-            }
-            //Updates time for the new entry in the arrayList
-            startTime = c.get(Calendar.MINUTE) * 60 + c.get(Calendar.SECOND);
-        } else
-            Log.d(TAG, "discard");
-
-        return averageRssi(1);
-    }
-
-
-    /** SUAVIZATION WITH MODE **/
-
-    /**
-     * Rssi suavization double.
-     *
-     * @param rssi Parametro obtido do metodo calculateDistance(int txPower, double receivedRssi), que representa o RSSI lido.
-     * @return Retorna a media dos RSSI's
-     */
-    public double rssiSuavizationMode(double rssi) {
-
-        double variation = 0, modeValue = 0;
-
-        if (rssiMode.size() < 15) {
-            // Preencher o ArrayList rssiMode() com 15 valores sem qualquer filtro.
-            rssiMode.add(rssi);
-            count = 0;
-        } else { // rssiMode() cheio.
-
-            // modeValue fica com a MODA dos valores de rssi obtidos.
-            modeValue = mode();
-
-            Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): moda: " + modeValue);
-
-
-            // variation fica com a diferença entre o rssi obtido com a MODA dos Rssi's
-            variation = Math.abs(rssi - modeValue);
-
-            // Janela de valores aceites a serem considerados para o calculo da nova MODA.
-            if (variation >= 0 && variation <= 5) {
-                count = 0;
-                rssiMode.remove(0);
-                rssiMode.add(rssi);
-            } else {
-                Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): receivedRssi > moda_variation (" + variation + ")");
-                // Se o rssi for descartado incrementamos a variavel count.
-                count++;
-                Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): count++");
-            }
-
-            // modeValue fica com a nova MODA
-            modeValue = mode();
-
-            // variation fica com a diferença entre o rssi obtido com a nova MODA dos Rssi's
-            variation = Math.abs(rssi - modeValue);
-
-            // Janela de valores aceites a serem considerados para o calculo da Media dos Rssi's.
-            if (variation >= 0 && variation <= 4) {
-                if (rssiArray.size() >= 20)
-                    rssiArray.remove(0);
-
-                rssiArray.add(rssi);
-            } else
-                Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): receivedRssi > media_variation (" + variation + ")");
-        }
-        /**
-         * Se count == 5, significa que 5 rssi seguidos foram descartados.
-         * É muito provavél que nos estejamos a deslocar e que estejamos a descartar valores importantes.
-         * Vamos retirar metade dos valores dos ArrayList's de maneira a deixar entrar novos valores para o calculo da nova
-         * MODA e Média.
-         */
-        if (count == 5) {
-            //Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): Count =  5 ");
-            for (int i = 0; i < 9; i++) {
-                rssiMode.remove(0);
-                if (rssiArray.size() >= 12)
-                    rssiArray.remove(0);
-            }
-        }
-
-        //Log.i("EddystoneDetailsScan", "rssiSuavizationMode(): mode: " + modeValue);
-
-        // Retorna a média dos Rssi's, valor que irá ser usado para o calculo da distancia.
-        return averageRssi(0);
-    }
-
-    /**
-     * public double mode() {
-     *
-     * @return Retorna um double que representa a MODA do conjunto de valores presente no ArrayList<Double> rssiMode.
-     */
-    public double mode() {
-        HashMap<Double, Integer> hm = new HashMap<>();
-        double temp = rssiMode.get(rssiMode.size() - 1);
-        int count = 0, max = 1;
-        for (int i = 0; i < rssiMode.size(); i++) {
-            if (hm.get(rssiMode.get(i)) != null) {
-                count = hm.get(rssiMode.get(i));
-                count++;
-                hm.put(rssiMode.get(i), count);
-                if (count > max) {
-                    max = count;
-                    temp = rssiMode.get(i);
+                if (distance != -1) {
+                    feedChart.addEntry(calc.getMovingAverageRssi(), eddystoneDevice.getRssi());
+                    receivedRssi = String.format("%.2f", eddystoneDevice.getRssi());
+                    suavizedRssi = String.format("%.2f", calc.getMovingAverageRssi());
                 }
-            } else {
-                hm.put(rssiMode.get(i), 1);
+
+                if (fileName != null && distance != -1) {
+                    //lf.saveLogToFile(fileName, String.valueOf(eddystoneDevice.getRssi()), String.valueOf(calc.getMovingAverageRssi()), distance, markingLog);
+                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog);
+                }
             }
+
         }
-        return temp;
     }
-
-    /**
-     * public double averageRssi() {
-     *
-     * @return um double que representa a Média do conjunto de valores presente no ArrayList<Double> rssiArray.
-     */
-    public double averageRssi(int id) {
-        double average = 0.0;
-        double sum = 0;
-
-        switch (id) {
-            // Method with mode
-            case 0:
-                if (rssiArray.size() == 0)
-                    return 0.0;
-
-                for (double val : rssiArray) {
-                    sum += val;
-                }
-                average = sum / rssiArray.size();
-                break;
-            // Method with moving average
-            case 1:
-                if (rssiMovingAverage.size() == 0)
-                    return 0.0;
-
-                for (double val : rssiMovingAverage) {
-                    sum += val;
-                }
-                average = sum / rssiMovingAverage.size();
-                break;
-        }
-
-        return average;
-
-    }
-
 
     public String getFileName() {
         return fileName;

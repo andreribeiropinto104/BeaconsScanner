@@ -16,7 +16,7 @@
         android:layout_width="59dp"
         android:layout_height="59dp"
         android:paddingTop="@dimen/nav_header_vertical_spacing"
-        android:src="@drawable/ic_bluetooth_searching_white_48dp" />
+        android:src="@drawable/ic_northteamsoftware" />
 
     <TextView android:layout_width="match_parent" android:layout_height="wrap_content"
         android:paddingTop="@dimen/nav_header_vertical_spacing" android:text="NorthTeam"

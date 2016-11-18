@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <application
         android:allowBackup="true"
@@ -70,15 +71,16 @@
             android:name=".ui.activity.TutorialActivity"
             android:noHistory="true"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
-            android:name="com.northteam.beaconsscanner.ui.activity.RealtimeLineChartActivity"
+            android:name=".ui.activity.RealtimeLineChartActivity"
             android:label="@string/title_activity_realtime_line_chart"
-            android:parentActivityName="com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity"
+            android:parentActivityName=".ui.activity.EddystoneDetailsActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity" />
         </activity>
+        <activity android:name=".ui.activity.FloatingActivity"></activity>
     </application>
+
 </manifest>

@@ -263,6 +263,11 @@ public class MainActivity extends AppCompatActivity
 
             showFileChooser();
 
+        } else if (id == R.id.nav_floating) {
+
+            Intent intentFloatingActivity = new Intent(MainActivity.this, FloatingActivity.class);
+            startActivity(intentFloatingActivity);
+
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -296,12 +301,12 @@ public class MainActivity extends AppCompatActivity
 
             try {
                 startActivityForResult(
-                        Intent.createChooser(intent, "Select a File to Upload"),
+                        Intent.createChooser(intent, "Select a LogFile to Upload"),
                         FILE_SELECT_CODE);
                 System.out.println("Select");
             } catch (android.content.ActivityNotFoundException ex) {
                 // Potentially direct the user to the Market with a Dialog
-                Toast.makeText(this, "Please install a File Manager.",
+                Toast.makeText(this, "Please install a LogFile Manager.",
                         Toast.LENGTH_SHORT).show();
             }
 
@@ -333,10 +338,10 @@ public class MainActivity extends AppCompatActivity
                     // Get the Uri of the selected file
                     Uri uri = data.getData();
                     System.out.println(uri);
-                    Log.d(TAG, "File Uri: " + uri.toString());
+                    Log.d(TAG, "LogFile Uri: " + uri.toString());
                     // Get the path
                     String path = FileUtils.getPath(this, uri);
-                    Log.d(TAG, "File Path: " + path);
+                    Log.d(TAG, "LogFile Path: " + path);
                     // Get the file instance
                     File file = new File(path);
                     // Initiate the upload

@@ -64,6 +64,8 @@
     <string name="fileSavedEddystone">Log file saved to folder Beacons Scanner/Eddystone/</string>
     <string name="fileSavedIbeacon">Log file saved to folder Beacons Scanner/IBeacon/</string>
     <string name="folderEmpty">Log folder is empty. First create log files</string>
+    <string name="fileSavingEddystoneChart">Saving file to folder Beacons Scanner/Eddystone.</string>
+    <string name="fileSavingIbeaconChart">Saving file to folder Beacons Scanner/IBeacon.</string>
 
     <!-- Permissions -->
     <string name="needsBluetoothPermissions">This app needs location access</string>
@@ -79,6 +81,8 @@
     <!-- Tutorial -->
     <string name="tutorialMain">This intro will guide you through the features of this app</string>
     <string name="tutorialApp">Scan and detect nearby beacons (both Eddystone and iBeacon) and show their details</string>
+    <string name="tutorialChart">Chart</string>
+    <string name="tutorialSeeChart">chart ...</string>
     <string name="tutorialLogs">Save logs about the received signals from your beacons</string>
     <string name="tutorialFolder">A folder with the name of the app was created on the root directory of your device</string>
     <string name="tutorialSaveFile">Every time you click Save log to a file, a .csv file is created in the corresponding folder.
@@ -88,8 +92,11 @@
     <string name="tutorialFolderApp">App Folder</string>
     <string name="tutorialfileCsv">CSV Files</string>
     <string name="tutorialReportText">On the menu there\'s an option to report data. If selected you can report the log files that you created to us, so that we can work to improve our algorithms</string>
-    <string name="title_activity_test">TestActivity</string>
+
+
     <string name="title_activity_realtime_line_chart">RealtimeLineChartActivity</string>
+
+    <string name="saveChartImage">Save chart to Gallery</string>
 
 
 </resources>

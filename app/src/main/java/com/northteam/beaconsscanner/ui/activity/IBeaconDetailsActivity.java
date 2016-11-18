@@ -9,6 +9,7 @@ import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
@@ -28,6 +29,7 @@ import com.kontakt.sdk.android.ble.util.BluetoothUtils;
 import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.adapter.monitor.IBeaconsDetailsScan;
+import com.northteam.beaconsscanner.util.LogFile;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -105,6 +107,18 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
         }
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fabIBeacon);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intentRealtimeChartActivity = new Intent(IBeaconDetailsActivity.this, RealtimeLineChartActivity.class);
+                intentRealtimeChartActivity.putExtra("IBEACON", ibeacon);
+                startActivity(intentRealtimeChartActivity);
+                //finish();
+
+            }
+        });
 
 
     }
@@ -239,6 +253,9 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
     public void startSaving() {
         // TODO ...
         Log.i(TAG, "onClick()");
+        LogFile lf = new LogFile("IBeacon");
+        lf.createLogFile(ibeacon.getTxPower());
+        /*
         String folderName = "IBeacon";
 
         Calendar c = Calendar.getInstance();
@@ -279,7 +296,10 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
             buf.append("Beacon Profile;");
             buf.append(folderName);
             buf.newLine();
-            buf.append("Date; Time; Received RSSI; Suavized RSSI;Distance");
+            buf.append("Tx Power;");
+            buf.append("" + ibeacon.getTxPower());
+            buf.newLine();
+            buf.append("Date; Time; Received RSSI; Suavized RSSI;Distance;Near");
             buf.newLine();
             buf.close();
         } catch (IOException e) {
@@ -287,6 +307,7 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
             e.printStackTrace();
         }
 
+*/
         ImageButton imgBtnSaveLog = (ImageButton) findViewById(R.id.imageButton_save_log_ibeacon);
         ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log_ibeacon);
         TextView txtSave = (TextView) findViewById(R.id.textView_save_log_ibeacon);
@@ -307,7 +328,7 @@ public class IBeaconDetailsActivity extends AppCompatActivity implements Proximi
             txtMark.setText(R.string.mark_log_file);
 
 
-            beaconScan.setFileName(fileName);
+            beaconScan.setFileName(lf.getFileName());
 
         }
 

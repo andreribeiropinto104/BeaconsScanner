@@ -23,5 +23,14 @@
 
     <include layout="@layout/content_ibeacon_details" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fabIBeacon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        android:src="@drawable/ic_show_chart_white_48dp" />
+
+
 
 </android.support.design.widget.CoordinatorLayout>

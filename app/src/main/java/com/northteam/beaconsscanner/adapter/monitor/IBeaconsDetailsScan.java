@@ -8,6 +8,7 @@ import android.text.Html;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.github.mikephil.charting.charts.LineChart;
 import com.kontakt.sdk.android.ble.configuration.ActivityCheckConfiguration;
 import com.kontakt.sdk.android.ble.configuration.ForceScanConfiguration;
 import com.kontakt.sdk.android.ble.configuration.scan.IBeaconScanContext;
@@ -23,6 +24,9 @@ import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
 import com.kontakt.sdk.android.common.profile.IBeaconDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.ui.activity.IBeaconDetailsActivity;
+import com.northteam.beaconsscanner.ui.activity.RealtimeLineChartActivity;
+import com.northteam.beaconsscanner.util.Calculate;
+import com.northteam.beaconsscanner.util.LogFile;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -42,8 +46,6 @@ import java.util.List;
  */
 public class IBeaconsDetailsScan {
 
-    private static final String TAG = "IBeaconDetailsScan";
-
 
     /**
      * The Device manager.
@@ -58,18 +60,14 @@ public class IBeaconsDetailsScan {
      */
     public String beaconIdentifier;
     public String namespaceIdentifier;
-    /**
-     * The Rssi mode - array used to save the received RSSI and then determine the Mode of the values.
-     */
-    public ArrayList<Double> rssiMode = new ArrayList<>();
-    /**
-     * The Rssi array - array used to save the received RSSI - if allowed (x > mode < y)  .
-     */
-    public ArrayList<Double> rssiArray = new ArrayList<>();
-    /**
-     * The Count - used to count how manny times a RSSI signal is throwed out.
-     */
-    int count = 0;
+
+    private LogFile lf = new LogFile("IBeacon");
+
+    /* CHART */
+    private LineChart mChart;
+    private FeedChart feedChart;
+
+
     /**
      * The Context
      */
@@ -78,6 +76,8 @@ public class IBeaconsDetailsScan {
     private String fileName = null;
 
     private boolean markingLog = false;
+
+    private Calculate calc = new Calculate("IBeaconsDetailsScan");
 
     /**
      * timerCount to check if connection with beacon was lost
@@ -103,19 +103,6 @@ public class IBeaconsDetailsScan {
     /**
      * Instantiates a new Beacons details scan.
      *
-     * @param context the context
-     */
-    public IBeaconsDetailsScan(Context context) {
-
-        this.context = context;
-        deviceManager = new ProximityManager(context);
-
-    }
-
-
-    /**
-     * Instantiates a new Beacons details scan.
-     *
      * @param context    the context
      * @param identifier the identifier
      */
@@ -124,6 +111,22 @@ public class IBeaconsDetailsScan {
         this.beaconIdentifier = identifier;
         this.context = context;
         deviceManager = new ProximityManager(context);
+    }
+
+    /**
+     * Instantiates a new Beacons details scan.
+     *
+     * @param context    the context
+     * @param identifier the identifier
+     * @param lc the Chart
+     */
+    public IBeaconsDetailsScan(Context context, String identifier, LineChart lc) {
+
+        this.beaconIdentifier = identifier;
+        this.context = context;
+        deviceManager = new ProximityManager(context);
+        this.feedChart = new FeedChart(lc, context);
+        this.mChart = lc;
     }
 
     /**
@@ -206,7 +209,7 @@ public class IBeaconsDetailsScan {
             timerCount.cancel();
             timerCount.start();
 
-            distance = calculateDistance(iBeaconDevice.getTxPower(), iBeaconDevice.getRssi());
+            distance = calc.calculateDistance(iBeaconDevice.getTxPower(), iBeaconDevice.getRssi());
 
 
             if (context == IBeaconDetailsActivity.getContext()) {
@@ -222,13 +225,14 @@ public class IBeaconsDetailsScan {
                 else {
                     distanceTextView.append(String.format("%.2f m", distance));
                     receivedRssi = String.format("%.2f", iBeaconDevice.getRssi());
-                    suavizedRssi = String.format("%.2f", rssiSuavization(iBeaconDevice.getRssi()));
+                    suavizedRssi = String.format("%.2f", calc.getMovingAverageRssi());
                 }
 
                 rssiTextView.setText(Html.fromHtml("<b>RSSI:</b> &nbsp;&nbsp;"));
                 rssiTextView.append(String.format("%.2f dBm", iBeaconDevice.getRssi()));
 
                 if (fileName != null && distance != -1) {
+                    /*
                     File dir = Environment.getExternalStorageDirectory();
 
                     File logFile = new File(dir + "/Beacons Scanner/" + folderName + "/" + fileName);
@@ -243,168 +247,30 @@ public class IBeaconsDetailsScan {
                         buf.append(suavizedRssi + ";");
                         buf.append(String.format("%.2f", distance));
                         if (isMarkingLog())
-                            buf.append(";*");
+                            buf.append(";YES");
                         buf.newLine();
                         buf.close();
                     } catch (IOException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
-                    }
+                    } */
+                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog);
                 }
 
-            }
+            } else if (context == RealtimeLineChartActivity.getContext()) {
+                if (distance != -1)
+                    feedChart.addEntry(calc.getMovingAverageRssi(), iBeaconDevice.getRssi());
+                if (fileName != null && distance != -1) {
+                    lf.saveLogToFile(fileName, String.valueOf(iBeaconDevice.getRssi()), String.valueOf(calc.getMovingAverageRssi()), distance, markingLog);
 
-        }
-
-    }
-
-    /**
-     * Calculate distance.
-     *
-     * @param txPower      the tx power
-     * @param receivedRssi the received rssi
-     */
-    public double calculateDistance(int txPower, double receivedRssi) {
-
-        Log.i(TAG, "-----------------------");
-
-
-        Log.i(TAG, "calculateDistance(): receivedRssi: " + receivedRssi);
-
-        double rssi = rssiSuavization(receivedRssi);
-        Log.i(TAG, "calculateDistance(): rssi suavizado: " + rssi);
-
-        if (rssi == 0) {
-            //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
-            //distanceTextView.append(String.format("a calibrar . . ."));
-            return -1.0; // if we cannot determine distance, return -1.
-        }
-
-        double ratio = rssi * 1.0 / txPower;
-        if (ratio < 1.0) {
-            return Math.pow(ratio, 10);
-            //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
-            //distanceTextView.append(String.format("%.2f cm", Math.pow(ratio, 10)));
-
-        } else {
-            double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
-            //distanceTextView.setText(Html.fromHtml("<b>Distância:</b> &nbsp;&nbsp;"));
-            //distanceTextView.append(String.format("%.2f cm", accuracy));
-            return accuracy;
-        }
-    }
-
-    /**
-     * Rssi suavization double.
-     *
-     * @param rssi Parametro obtido do metodo calculateDistance(int txPower, double receivedRssi), que representa o RSSI lido.
-     * @return Retorna a media dos RSSI's
-     */
-    public double rssiSuavization(double rssi) {
-
-        double variation = 0, modeValue = 0;
-
-        if (rssiMode.size() < 15) {
-
-            // Preencher o ArrayList rssiMode() com 15 valores sem qualquer filtro.
-            rssiMode.add(rssi);
-            count = 0;
-        } else { // rssiMode() cheio.
-
-            // modeValue fica com a MODA dos valores de rssi obtidos.
-            modeValue = mode();
-
-            // variation fica com a diferença entre o rssi obtido com a MODA dos Rssi's
-            variation = Math.abs(rssi) - Math.abs(modeValue);
-
-            // Janela de valores aceites a serem considerados para o calculo da nova MODA.
-            if (variation >= 0 && variation <= 5) {
-                count = 0;
-                rssiMode.remove(0);
-                rssiMode.add(rssi);
-            } else {
-                // Se o rssi for descartado a variável count é incrementada.
-                count++;
-            }
-
-            // modeValue fica com a nova MODA
-            modeValue = mode();
-
-            // variation fica com a diferença entre o rssi obtido com a nova MODA dos Rssi's
-            variation = Math.abs(rssi) - Math.abs(modeValue);
-
-            // Janela de valores aceites a serem considerados para o calculo da Media dos Rssi's.
-            if (variation >= 0 && variation <= 3) {
-                if (rssiArray.size() >= 20)
-                    rssiArray.remove(0);
-
-                rssiArray.add(rssi);
-            }
-        }
-
-        /**
-         * Se count == 5, significa que 5 rssi seguidos foram descartados.
-         * É muito provável que nos estejamos a deslocar e que estejamos a descartar valores importantes.
-         * Vamos retirar metade dos valores dos ArrayList's de maneira a deixar entrar novos valores para o cálculo da nova
-         * MODA e Média.
-         */
-        if (count == 5) {
-            Log.i(TAG, "rssiSuavizationMode(): Count =  5 ");
-            for (int i = 0; i < 9; i++) {
-                rssiMode.remove(0);
-                if (rssiArray.size() >= 12)
-                    rssiArray.remove(0);
-            }
-        }
-
-        Log.i(TAG, "rssiSuavizationMode(): mode: " + modeValue);
-
-        // Retorna a média dos Rssi's, valor que irá ser usado para o calculo da distancia.
-        return averageRssi();
-    }
-
-    /**
-     * public double mode() {
-     *
-     * @return Retorna um double que representa a MODA do conjunto de valores presente no ArrayList<Double> rssiMode.
-     */
-    public double mode() {
-        HashMap<Double, Integer> hm = new HashMap<>();
-        double temp = rssiMode.get(rssiMode.size() - 1);
-        int count = 0, max = 1;
-        for (int i = 0; i < rssiMode.size(); i++) {
-            if (hm.get(rssiMode.get(i)) != null) {
-                count = hm.get(rssiMode.get(i));
-                count++;
-                hm.put(rssiMode.get(i), count);
-                if (count > max) {
-                    max = count;
-                    temp = rssiMode.get(i);
                 }
-            } else {
-                hm.put(rssiMode.get(i), 1);
             }
-        }
-        return temp;
-    }
 
-    /**
-     * public double averageRssi() {
-     *
-     * @return Retorna um double que representa a Média do conjunto de valores presente no ArrayList<Double> rssiArray.
-     */
-    public double averageRssi() {
 
-        if (rssiArray.size() == 0)
-            return 0.0;
-        double sum = 0;
-
-        for (double val : rssiArray) {
-            sum += val;
         }
 
-        return sum / rssiArray.size();
     }
+
 
 
     public String getFileName() {

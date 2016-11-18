@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
@@ -30,13 +29,9 @@ import com.kontakt.sdk.android.ble.util.BluetoothUtils;
 import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.adapter.monitor.EddystoneDetailsScan;
+import com.northteam.beaconsscanner.util.LogFile;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 import butterknife.Bind;
@@ -156,11 +151,9 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                System.out.println(TAG);
                 Intent intentRealtimeChartActivity = new Intent(EddystoneDetailsActivity.this, RealtimeLineChartActivity.class);
                 intentRealtimeChartActivity.putExtra("EDDYSTONE", eddystone);
                 startActivity(intentRealtimeChartActivity);
-                //finish();
 
             }
         });
@@ -197,7 +190,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "read storage permission granted");
                     String folderName = "Eddystone";
-                    File directory = new File(Environment.getExternalStorageDirectory() + "/Beacons Scanner", folderName);
+                    java.io.File directory = new java.io.File(Environment.getExternalStorageDirectory() + "/Beacons Scanner", folderName);
                     if (!directory.exists()) {
                         try {
                             if (directory.mkdir()) {
@@ -298,13 +291,14 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     @OnClick(R.id.imageButton_save_log)
     public void startSaving() {
 
-
-        String folderName = "Eddystone";
+        LogFile lf = new LogFile("Eddystone");
+        lf.createLogFile(eddystone.getTxPower());
+        /*String folderName = "Eddystone";
 
         Calendar c = Calendar.getInstance();
         fileName = c.get(Calendar.YEAR) + "" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "_" + c.get(Calendar.HOUR_OF_DAY) + "" + c.get(Calendar.MINUTE) + ".csv";
 
-        File directory = new File(Environment.getExternalStorageDirectory() + "/Beacons Scanner", folderName);
+        LogFile directory = new LogFile(Environment.getExternalStorageDirectory() + "/Beacons Scanner", folderName);
         System.out.println(directory.getAbsolutePath());
         if (!directory.exists()) {
             try {
@@ -317,7 +311,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
                 e.printStackTrace();
             }
         }
-        File logFile = new File(directory + "/" + fileName);
+        LogFile logFile = new LogFile(directory + "/" + fileName);
 
         if (!logFile.exists()) {
             try {
@@ -349,6 +343,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+        */
 
         ImageButton imgBtnSaveLog = (ImageButton) findViewById(R.id.imageButton_save_log);
         ImageButton imgBtnStopSaveLog = (ImageButton) findViewById(R.id.imageButton_stop_save_log);
@@ -370,7 +365,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             txtMark.setText(R.string.mark_log_file);
 
 
-            eddystoneScan.setFileName(fileName);
+            eddystoneScan.setFileName(lf.getFileName());
 
         }
 
