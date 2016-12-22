@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_floating) {
 
-            Intent intentFloatingActivity = new Intent(MainActivity.this, FloatingActivity.class);
+            Intent intentFloatingActivity = new Intent(MainActivity.this, BeaconsScanCalibrationActivity.class);
             startActivity(intentFloatingActivity);
 
         }

@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
+
     <uses-feature android:name="android.hardware.location.gps" />
 
     <application
@@ -80,7 +81,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity" />
         </activity>
-        <activity android:name=".ui.activity.FloatingActivity"></activity>
+        <activity android:name=".ui.activity.FloatingActivity" />
+        <activity android:name=".ui.activity.BeaconsScanCalibrationActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity android:name=".ui.activity.CalibrationActivity"></activity>
     </application>
 
 </manifest>

@@ -72,6 +72,9 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
     public TextView batteryTextView;
     @Bind(R.id.eddystone_url)
     public TextView urlTextView;
+    @Bind(R.id.eddystone_data_rate)
+    public TextView dataRateTextView;
+
 
     //@Bind(R.id.eddystone_temperature)
     //public TextView temperatureTextView;
@@ -126,6 +129,7 @@ public class EddystoneDetailsActivity extends AppCompatActivity implements Proxi
             //beaconScan = new EddystoneDetailsScan(this, eddystone.getInstanceId());
             //nameTextView.setText(Html.fromHtml("<b>Nome:</b> &nbsp;&nbsp;" + eddystone.getNamespaceId()));
             distanceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.distance) + ":</b>&nbsp;&nbsp;<i>" + this.getString(R.string.calibrating) + "...</i>"));
+            dataRateTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.data_rate) + ":</b>&nbsp;&nbsp;<i>" + this.getString(R.string.calibrating) + "...</i>"));
 
             namespaceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.namespace) + ":</b> &nbsp;&nbsp;" + eddystone.getNamespaceId()));
             instaceTextView.setText(Html.fromHtml("<b>" + this.getString(R.string.instance) + ":</b> &nbsp;&nbsp;" + eddystone.getInstanceId()));

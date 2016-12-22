@@ -71,6 +71,7 @@
     <string name="stop_mark_log_file">Clique quando se afastar do beacon</string>
     <string name="suavizedRssi">Rssi Suavizado</string>
     <string name="receivedRssi">Rssi Recebido</string>
+    <string name="data_rate">Taxa de Transmição:</string>
 
 
 </resources>

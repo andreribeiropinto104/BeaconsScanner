@@ -64,7 +64,7 @@ public class LogFile {
             buf.append("Tx Power;");
             buf.append("" + txPower);
             buf.newLine();
-            buf.append("Date; Time; Received RSSI; Suavized RSSI; Distance; Near");
+            buf.append("Date; Time; Received RSSI; Suavized RSSI; Distance;Raw Distance;Near");
             buf.newLine();
             buf.close();
         } catch (IOException e) {
@@ -73,7 +73,7 @@ public class LogFile {
         }
     }
 
-    public void saveLogToFile(String filename, String receivedRssi, String suavizedRssi, double distance, boolean markingLog) {
+    public void saveLogToFile(String filename, String receivedRssi, String suavizedRssi, double distance, boolean markingLog, double rawDistance) {
 
         File dir = Environment.getExternalStorageDirectory();
         File logFile = new File(dir + "/Beacons Scanner/" + folderName + "/" + filename);
@@ -88,6 +88,7 @@ public class LogFile {
             buf.append(receivedRssi + ";");
             buf.append(suavizedRssi + ";");
             buf.append(String.format("%.2f", distance));
+            buf.append(";"+rawDistance);
             if (markingLog)
                 buf.append(";YES");
             buf.newLine();

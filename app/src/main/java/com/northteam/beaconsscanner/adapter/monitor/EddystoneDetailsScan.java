@@ -3,7 +3,6 @@ package com.northteam.beaconsscanner.adapter.monitor;
 import android.app.Activity;
 import android.content.Context;
 import android.os.CountDownTimer;
-import android.os.Environment;
 import android.text.Html;
 import android.util.Log;
 import android.widget.TextView;
@@ -23,20 +22,15 @@ import com.kontakt.sdk.android.ble.manager.ProximityManager;
 import com.kontakt.sdk.android.ble.rssi.RssiCalculators;
 import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
+import com.northteam.beaconsscanner.ui.activity.CalibrationActivity;
 import com.northteam.beaconsscanner.ui.activity.EddystoneDetailsActivity;
 import com.northteam.beaconsscanner.util.Calculate;
 import com.northteam.beaconsscanner.ui.activity.RealtimeLineChartActivity;
 import com.northteam.beaconsscanner.util.LogFile;
 
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.HashMap;
 import java.util.List;
 
 
@@ -49,6 +43,13 @@ import java.util.List;
 public class EddystoneDetailsScan {
 
     private static final String TAG = "EddystoneDetailsScan";
+
+
+    ArrayList<Double> x = new ArrayList();
+    ArrayList<Double> y = new ArrayList();
+    ArrayList<Double> rssisVal = new ArrayList();
+
+    private double mode;
 
 
     /**
@@ -77,6 +78,9 @@ public class EddystoneDetailsScan {
     private String fileName = null;
     private boolean markingLog = false;
     private Context context;
+    private float numOfEvents = 0;
+    private int numTotalOfEvents = 0;
+
     CountDownTimer timerCount = new CountDownTimer(5000, 1000) {
 
         public void onTick(long millisUntilFinished) {
@@ -88,6 +92,23 @@ public class EddystoneDetailsScan {
                 TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
                 rssiTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.rssi) + ":</b> &nbsp;&nbsp;<i>" + context.getString(R.string.noSignal) + "...</i>"));
             }
+        }
+    };
+
+    CountDownTimer timerDataRate = new CountDownTimer(10000, 1000) {
+
+        public void onTick(long millisUntilFinished) {
+
+        }
+
+        public void onFinish() {
+            if (context == EddystoneDetailsActivity.getContext()) {
+                TextView dataRateTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_data_rate);
+                dataRateTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.data_rate) + ":</b> &nbsp;&nbsp;<i>" + numOfEvents/10 + " rssi/s</i>"));
+            }
+            timerDataRate.cancel();
+            numOfEvents=0;
+            timerDataRate.start();
         }
     };
     private List<EventType> eventTypes = new ArrayList<EventType>() {{
@@ -134,7 +155,8 @@ public class EddystoneDetailsScan {
      * @param listener the listener
      */
     public void startScan(final ProximityManager.ProximityListener listener) {
-
+        numTotalOfEvents = 0;
+        timerDataRate.start();
         deviceManager.initializeScan(getOrCreateScanContext(), new OnServiceReadyListener() {
             @Override
             public void onServiceReady() {
@@ -148,6 +170,7 @@ public class EddystoneDetailsScan {
         });
 
     }
+
 
     /**
      * Gets or create scan context.
@@ -206,17 +229,23 @@ public class EddystoneDetailsScan {
         String receivedRssi = "";
         String suavizedRssi = "";
 
+
+
+
         double distance;
 
         for (IEddystoneDevice eddystoneDevice : eddystoneDevices) {
+            numTotalOfEvents++;
+            numOfEvents++;
 
-            timerCount.cancel();
-            timerCount.start();
-
-            distance = calc.calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
 
             if (context == EddystoneDetailsActivity.getContext()) {
 
+
+                timerCount.cancel();
+                timerCount.start();
+
+                distance = calc.calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
 
                 distanceTextView.setText(Html.fromHtml("<b>" + context.getString(R.string.distance) + ":</b>&nbsp;&nbsp;"));
 
@@ -259,11 +288,13 @@ public class EddystoneDetailsScan {
                         e.printStackTrace();
                     }
                     */
-                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog);
+                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog, eddystoneDevice.getDistance());
 
                 }
 
             } else if (context == RealtimeLineChartActivity.getContext()) {
+                distance = calc.calculateDistance(eddystoneDevice.getTxPower(), eddystoneDevice.getRssi());
+
                 if (distance != -1) {
                     feedChart.addEntry(calc.getMovingAverageRssi(), eddystoneDevice.getRssi());
                     receivedRssi = String.format("%.2f", eddystoneDevice.getRssi());
@@ -272,7 +303,18 @@ public class EddystoneDetailsScan {
 
                 if (fileName != null && distance != -1) {
                     //lf.saveLogToFile(fileName, String.valueOf(eddystoneDevice.getRssi()), String.valueOf(calc.getMovingAverageRssi()), distance, markingLog);
-                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog);
+                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog, eddystoneDevice.getDistance());
+                }
+            } else if (context == CalibrationActivity.getContext()) {
+                if (numTotalOfEvents < 10) {
+                    Log.i(TAG, "num: " + numTotalOfEvents);
+                    Log.i(TAG, "rssi: " + eddystoneDevice.getRssi());
+
+                    rssisVal.add(eddystoneDevice.getRssi());
+                } else {
+                    Log.i(TAG, "finish");
+                    setMode(Calculate.mode(rssisVal));
+                    deviceManager.finishScan();
                 }
             }
 
@@ -293,6 +335,14 @@ public class EddystoneDetailsScan {
 
     public void setMarkingLog(boolean markingLog) {
         this.markingLog = markingLog;
+    }
+
+    public double getMode() {
+        return mode;
+    }
+
+    public void setMode(double mode) {
+        this.mode = mode;
     }
 }
 

@@ -25,6 +25,8 @@
     <string name="namespace">Namespace</string>
     <string name="instance">Instance</string>
     <string name="url">Url:</string>
+    <string name="data_rate">Data Rate:</string>
+
     <string name="tx_power_level">Power: </string>
     <string name="battery_voltage">Battery</string>
 

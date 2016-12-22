@@ -184,7 +184,28 @@
 
             </LinearLayout>
 
-            <LinearLayout
+            <LinearLayout android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingBottom="20dp"
+                android:paddingLeft="15dp">
+
+                <TextView
+                    android:id="@+id/eddystone_data_rate"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="right"
+                    android:layout_weight="0.27"
+                    android:text="@string/data_rate"
+                    android:textSize="16sp" />
+
+        </LinearLayout>
+
+
+
+
+
+    <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">

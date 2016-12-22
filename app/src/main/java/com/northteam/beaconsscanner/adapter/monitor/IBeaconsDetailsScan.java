@@ -254,14 +254,14 @@ public class IBeaconsDetailsScan {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     } */
-                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog);
+                    lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog, iBeaconDevice.getDistance());
                 }
 
             } else if (context == RealtimeLineChartActivity.getContext()) {
                 if (distance != -1)
                     feedChart.addEntry(calc.getMovingAverageRssi(), iBeaconDevice.getRssi());
                 if (fileName != null && distance != -1) {
-                    lf.saveLogToFile(fileName, String.valueOf(iBeaconDevice.getRssi()), String.valueOf(calc.getMovingAverageRssi()), distance, markingLog);
+                    lf.saveLogToFile(fileName, String.valueOf(iBeaconDevice.getRssi()), String.valueOf(calc.getMovingAverageRssi()), distance, markingLog, iBeaconDevice.getDistance());
 
                 }
             }

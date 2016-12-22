@@ -55,6 +55,7 @@ public class Calculate {
      * @param rssi
      * @param txPower
      * @return
+     *     //return Math.pow(10d, ((double) txPower - rssi) / (10 * 2));
      */
     public double getDistance(Double rssi, int txPower) {
 
@@ -259,6 +260,30 @@ public class Calculate {
                 }
             } else {
                 hm.put(rssiMode.get(i), 1);
+            }
+        }
+        return temp;
+    }
+    /**
+     * public double mode() {
+     *
+     * @return Retorna um double que representa a MODA do conjunto de valores presente no ArrayList<Double> rssiMode.
+     */
+    public static double mode(ArrayList<Double> rssis) {
+        HashMap<Double, Integer> hm = new HashMap<>();
+        double temp = rssis.get(rssis.size() - 1);
+        int count = 0, max = 1;
+        for (int i = 0; i < rssis.size(); i++) {
+            if (hm.get(rssis.get(i)) != null) {
+                count = hm.get(rssis.get(i));
+                count++;
+                hm.put(rssis.get(i), count);
+                if (count > max) {
+                    max = count;
+                    temp = rssis.get(i);
+                }
+            } else {
+                hm.put(rssis.get(i), 1);
             }
         }
         return temp;
