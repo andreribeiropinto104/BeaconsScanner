@@ -19,6 +19,7 @@ import com.kontakt.sdk.android.common.profile.IEddystoneDevice;
 import com.northteam.beaconsscanner.R;
 import com.northteam.beaconsscanner.adapter.monitor.EddystoneDetailsScan;
 import com.northteam.beaconsscanner.util.Dataset;
+import com.northteam.beaconsscanner.util.LogFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,19 +40,19 @@ public class CalibrationActivity extends AppCompatActivity implements ProximityM
     public String beaconIdentifier;
     public String namespaceIdentifier;
 
-    ArrayList<Double> x = new ArrayList();
-    ArrayList<Double> y = new ArrayList();
+    static ArrayList<Double> x = new ArrayList();
+    static ArrayList<Double> y = new ArrayList();
 
 
     /**
      * The Eddystone scan.
      */
-    EddystoneDetailsScan eddystoneScan;
+    static EddystoneDetailsScan eddystoneScan;
 
     /**
      * The Eddystone.
      */
-    IEddystoneDevice eddystone;
+    static IEddystoneDevice eddystone;
     private List<EventType> eventTypes = new ArrayList<EventType>() {{
         add(EventType.DEVICES_UPDATE);
     }};
@@ -65,19 +66,27 @@ public class CalibrationActivity extends AppCompatActivity implements ProximityM
         return context;
     }
 
-    @Bind(R.id.textView3)
-    public TextView dist;
-    @Bind(R.id.button)
-    public Button calBtn;
+    /*@Bind(R.id.setDistance)
+    public TextView dist;*/
+    static TextView dist;
+    static Button calBtn;
+static TextView modeTxt;
+    /*   @Bind(R.id.button)
+       public Button calBtn;
+   */
+    static int calCount;
 
-    int calCount;
+    static LogFile lf = new LogFile("Eddystone");
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calibration);
 
-
+        dist = (TextView) findViewById(R.id.setDistance);
+        modeTxt = (TextView) findViewById(R.id.modeTxt);
+        calBtn = (Button) findViewById(R.id.button);
 
         context = this;
 
@@ -86,13 +95,11 @@ public class CalibrationActivity extends AppCompatActivity implements ProximityM
         final Bundle extras = getIntent().getExtras();
         if (extras != null) {
             calCount = 0;
-            y.add(0.25);
-            y.add(0.5);
             y.add(1.0);
             y.add(2.0);
             y.add(3.0);
             y.add(4.0);
-/*            y.add(5.0);
+            y.add(5.0);
             y.add(6.0);
             y.add(7.0);
             y.add(8.0);
@@ -102,13 +109,13 @@ public class CalibrationActivity extends AppCompatActivity implements ProximityM
             y.add(14.0);
             y.add(16.0);
             y.add(18.0);
-            y.add(20.0);
+            /*y.add(20.0);
             y.add(25.0);
             y.add(30.0);
             y.add(40.0);*/
 
-            dist.setText("Coloque-se a " + this.y.get(calCount) + " cm");
 
+            dist.setText("Coloque-se a " + this.y.get(calCount) + " m");
             // Recebe da atividade anterior como parâmetro o dispositivo selecionado
             eddystone = (IEddystoneDevice) extras.get("EDDYSTONE");
 
@@ -117,54 +124,24 @@ public class CalibrationActivity extends AppCompatActivity implements ProximityM
             beaconIdentifier = eddystone.getInstanceId();
             eddystoneScan = new EddystoneDetailsScan(context, beaconIdentifier, namespaceIdentifier);
 
+            lf.createCalibrationFile(eddystone.getTxPower(), "kontakt");
+            eddystoneScan.setFileName(lf.getFileName());
+
         }
 
 
-        /*ArrayList<Double> x = new ArrayList();
-        ArrayList<Double> y = new ArrayList();
-
-        x.add(0.8039215686);
-        x.add(0.8431372549);
-        x.add(0.9607843137);
-        x.add(1.274509804);
-        x.add(1.137254902);
-        x.add(1.117647059);
-        x.add(1.31372549);
-        x.add(1.31372549);
-        x.add(1.509803922);
-        x.add(1.37254902);
-        x.add(1.352941176);
-        x.add(1.470588235);
-        x.add(1.411764706);
-        x.add(1.411764706);
-        x.add(1.529411765);
-        x.add(1.62745098);
-        x.add(1.588235294);
-        x.add(1.588235294);
-        x.add(1.470588235);
-        x.add(1.62745098);
+        calBtn.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                calCount++;
+                eddystoneScan.startScan(CalibrationActivity.this);
+                calBtn.setVisibility(View.INVISIBLE);
 
 
-        y.add(0.25);
-        y.add(0.5);
-        y.add(1.0);
-        y.add(2.0);
-        y.add(3.0);
-        y.add(4.0);
-        y.add(5.0);
-        y.add(6.0);
-        y.add(7.0);
-        y.add(8.0);
-        y.add(9.0);
-        y.add(10.0);
-        y.add(12.0);
-        y.add(14.0);
-        y.add(16.0);
-        y.add(18.0);
-        y.add(20.0);
-        y.add(25.0);
-        y.add(30.0);
-        y.add(40.0);
+            }
+        });
+
+/*
 
         Dataset dataset = new Dataset(x, y);
         double[] result = getPowerRegression(dataset);
@@ -181,20 +158,37 @@ public class CalibrationActivity extends AppCompatActivity implements ProximityM
 
     @Override
     public void onScanStop() {
-        Log.i(TAG, "Racio: " + eddystoneScan.getMode()/eddystone.getTxPower());
-        this.x.add(eddystoneScan.getMode()/eddystone.getTxPower());
-        //calBtn.setVisibility(View.VISIBLE);
-//        dist.setText("Coloque-se a " + this.y.get(calCount) + " cm");
+
+
+    }
+
+    public static void teste() {
+
+        double racio = eddystoneScan.getMode() / eddystone.getTxPower();
+        Log.i(TAG, "Racio: " + racio);
+        x.add(racio);
         Log.i(TAG, "count: " + calCount);
-        Log.i(TAG, "size: " + this.y.size());
-        if (calCount == this.y.size()) {
+        Log.i(TAG, "size: " + y.size());
+        System.out.println("file: " + lf.getFileName());
+        System.out.println("eddy: " + eddystoneScan.getFileName());
+        lf.saveCalibrationToFile(eddystoneScan.getFileName(), eddystoneScan.getMode(), y.get(calCount - 1));
+        modeTxt.setText("Moda obtida a " + y.get(calCount-1) + " : " +eddystoneScan.getMode());
+
+        if (calCount == y.size()) {
+            dist.setText("Calibração terminada");
             Dataset dataset = new Dataset(x, y);
             double[] result = getPowerRegression(dataset);
             System.out.println("Result[0]" + result[0]);
             System.out.println("Result[1]" + result[1]);
+            lf.saveConstCalibrationToFile(eddystoneScan.getFileName(), result[0], result[1]);
+
         } else {
-            Log.i(TAG, "Coloque-se a " + this.y.get(calCount) + " cm");
+            Log.i(TAG, "Coloque-se a " + y.get(calCount) + " cm");
+            dist.setText("Coloque-se a " + y.get(calCount) + " m");
+            calBtn.setVisibility(View.VISIBLE);
+
         }
+
 
     }
 
@@ -232,15 +226,15 @@ public class CalibrationActivity extends AppCompatActivity implements ProximityM
         eddystoneScan.deviceManager.disconnect();
         eddystoneScan.deviceManager = null;
     }
-
+/*
     @OnClick(R.id.button)
     public void startScanningCalibration() {
         calCount++;
         eddystoneScan.startScan(CalibrationActivity.this);
-        //calBtn.setVisibility(View.INVISIBLE);
+        calBtn.setVisibility(View.INVISIBLE);
 
         System.out.println("click");
 
 
-    }
+    }*/
 }

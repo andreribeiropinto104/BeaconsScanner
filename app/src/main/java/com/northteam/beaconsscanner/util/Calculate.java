@@ -18,7 +18,7 @@ public class Calculate {
     private double startTime = 0;
     private double timeBetweenTwoBeacons = 0;
     private double movingAverageRssi = 0.0;
-    private static int mps = 2;
+    private static int mps = 3;
 
     // Variables used in the Mode Method
     /**
@@ -110,8 +110,9 @@ public class Calculate {
                 //distanceTextView.append(String.format("%.2f cm", Math.pow(ratio, 10)));
 
             } else {
-                double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
-                return accuracy;
+//                double accuracy = (0.89976) * Math.pow(ratio, 7.7095) + 0.111;
+                       return (0.00493888810426388) * Math.pow(ratio, 7.08998828460171);
+//                return accuracy;
             }
         }
     }

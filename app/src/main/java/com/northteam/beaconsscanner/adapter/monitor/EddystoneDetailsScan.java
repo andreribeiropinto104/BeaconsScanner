@@ -155,6 +155,7 @@ public class EddystoneDetailsScan {
      * @param listener the listener
      */
     public void startScan(final ProximityManager.ProximityListener listener) {
+        rssisVal.clear();
         numTotalOfEvents = 0;
         timerDataRate.start();
         deviceManager.initializeScan(getOrCreateScanContext(), new OnServiceReadyListener() {
@@ -225,6 +226,7 @@ public class EddystoneDetailsScan {
         List<IEddystoneDevice> eddystoneDevices = event.getDeviceList();
         TextView distanceTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_distance);
         TextView rssiTextView = (TextView) ((Activity) context).findViewById(R.id.eddystone_rssi);
+        TextView eventNumbersText = (TextView) ((Activity) context).findViewById(R.id.eventNumbers);
 
         String receivedRssi = "";
         String suavizedRssi = "";
@@ -306,7 +308,8 @@ public class EddystoneDetailsScan {
                     lf.saveLogToFile(fileName, receivedRssi, suavizedRssi, distance, markingLog, eddystoneDevice.getDistance());
                 }
             } else if (context == CalibrationActivity.getContext()) {
-                if (numTotalOfEvents < 10) {
+                eventNumbersText.setText("Número de eventos: " + numTotalOfEvents);
+                if (numTotalOfEvents < 100) {
                     Log.i(TAG, "num: " + numTotalOfEvents);
                     Log.i(TAG, "rssi: " + eddystoneDevice.getRssi());
 
@@ -314,6 +317,8 @@ public class EddystoneDetailsScan {
                 } else {
                     Log.i(TAG, "finish");
                     setMode(Calculate.mode(rssisVal));
+                    CalibrationActivity.teste();
+
                     deviceManager.finishScan();
                 }
             }

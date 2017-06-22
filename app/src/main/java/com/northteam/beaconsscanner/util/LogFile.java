@@ -101,6 +101,112 @@ public class LogFile {
     }
 
 
+    public void createCalibrationFile(int txPower, String beaconName) {
+        Calendar c = Calendar.getInstance();
+        setFileName("Calibration_" + c.get(Calendar.YEAR) + "" + String.format("%02d", c.get(Calendar.MONTH) + 1) + "" + String.format("%02d", c.get(Calendar.DAY_OF_MONTH)) + "_" + c.get(Calendar.HOUR_OF_DAY) + "" + String.format("%02d",c.get(Calendar.MINUTE)) + ".csv");
+
+        java.io.File directory = new java.io.File(Environment.getExternalStorageDirectory() + "/Beacons Scanner", folderName + "/Calibration");
+        if (!directory.exists()) {
+            try {
+                if (directory.mkdir()) {
+                    System.out.println("Directory created");
+                } else {
+                    System.out.println("Directory is not created");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        java.io.File logFile = new java.io.File(directory + "/" + getFileName());
+
+        if (!logFile.exists()) {
+            try {
+                logFile.createNewFile();
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
+        try {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, false));
+            buf.append("Android Device");
+            buf.newLine();
+            buf.append("Device Model;");
+            buf.append(Build.MODEL + ";");
+            buf.newLine();
+            buf.append("Android Version;");
+            buf.append(Build.VERSION.RELEASE);
+            buf.newLine();
+            buf.newLine();
+            buf.append("Beacon Info");
+            buf.newLine();
+            buf.append("Beacon Profile;");
+            buf.append(folderName);
+            buf.newLine();
+            buf.append(beaconName);
+            buf.newLine();
+            buf.append("Tx Power;");
+            buf.append("" + txPower);
+            buf.newLine();
+            buf.append("Meters; RSSI");
+            buf.newLine();
+            buf.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+
+    public void saveCalibrationToFile(String filename, double mode, double distance) {
+
+
+        File dir = Environment.getExternalStorageDirectory();
+        File logFile = new File(dir + "/Beacons Scanner/" + folderName + "/Calibration/" + filename);
+
+        try {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.append(distance + ";");
+            buf.append(mode + ";");
+            buf.newLine();
+            buf.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+    public void saveConstCalibrationToFile(String filename, double A, double B) {
+
+
+        File dir = Environment.getExternalStorageDirectory();
+        File logFile = new File(dir + "/Beacons Scanner/" + folderName + "/Calibration/" + filename);
+
+        try {
+            //BufferedWriter for performance, true to set append to file flag
+            BufferedWriter buf = new BufferedWriter(new FileWriter(logFile, true));
+            buf.newLine();
+            buf.newLine();
+            buf.append("A:" + ";");
+            buf.append(A + "");
+            buf.newLine();
+            buf.append("B:" + ";");
+            buf.append(B + "");
+            buf.newLine();
+            buf.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
+
+
     public String getFileName() {
         return fileName;
     }
